@@ -1,0 +1,7 @@
+# 🟢 安全配置：防止在此目錄內執行任何 PHP 腳本
+# 即使有 Webshell 被成功上傳，Apache 也會拒絕執行，或是將其當作純文字下載
+
+<FilesMatch "\.(php|php5|php7|php8|phtml)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>

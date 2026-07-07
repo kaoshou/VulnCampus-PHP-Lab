@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  db:
+    image: mariadb:10.11
+    container_name: vuln-db
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db:/docker-entrypoint-initdb.d
+    ports:
+      - "3306:3306"
+    networks:
+      - vuln-network
+
+  app-vulnerable:
+    build:
+      context: ./app-vulnerable
+      dockerfile: Dockerfile
+    container_name: vuln-app-vulnerable
+    restart: always
+    ports:
+      - "8080:80"
+    volumes:
+      - ./app-vulnerable/public:/var/www/html/public
+      - ./app-vulnerable/src:/var/www/html/src
+    depends_on:
+      - db
+    networks:
+      - vuln-network
+
+  app-fixed:
+    build:
+      context: ./app-fixed
+      dockerfile: Dockerfile
+    container_name: vuln-app-fixed
+    restart: always
+    ports:
+      - "8081:80"
+    volumes:
+      - ./app-fixed/public:/var/www/html/public
+      - ./app-fixed/src:/var/www/html/src
+    depends_on:
+      - db
+    networks:
+      - vuln-network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: vuln-phpmyadmin
+    restart: always
+    ports:
+      - "8082:80"
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    depends_on:
+      - db
+    networks:
+      - vuln-network
+
+networks:
+  vuln-network:
+    driver: bridge
+
+volumes:
+  db-data:

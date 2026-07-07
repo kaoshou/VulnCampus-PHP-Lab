@@ -1,0 +1,47 @@
+# ZAP Automation Framework Configuration
+# 用於 VulnCampus 靶場的自動化 Baseline 掃描設定範例
+
+env:
+  contexts:
+    - name: "VulnCampus Context"
+      urls:
+        - "http://localhost:8080/"
+      includePaths:
+        - "http://localhost:8080/.*"
+      excludePaths:
+        - "http://localhost:8080/logout.php"
+        - "http://localhost:8080/debug.php" # 調試頁可視需要排除，避免造成掃描停滯
+      authentication:
+        method: "manual" # 預設手動登入或被動截取，亦可更改為 form-based
+
+  parameters:
+    failOnError: true
+    failOnWarning: false
+    progressToStdout: true
+
+jobs:
+  - type: passiveScan-config
+    parameters:
+      maxAlertsPerRule: 10
+      scanOnlyInScope: true
+
+  - type: spider
+    parameters:
+      context: "VulnCampus Context"
+      user: ""
+      url: ""
+      maxDuration: 5
+      maxDepth: 5
+      maxChildren: 100
+
+  - type: passiveScan-wait
+    parameters:
+      maxDuration: 5
+
+  - type: report
+    parameters:
+      template: "modern-html"
+      reportDir: "./reports"
+      reportFile: "vuln-campus-before-report"
+      reportTitle: "VulnCampus PHP Lab 被動掃描報告 (弱點版)"
+      reportSummary: "本報告為 VulnCampus PHP Lab 弱點版網站在進行安全改善前的基線測試成果。"
