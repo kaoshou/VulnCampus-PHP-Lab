@@ -78,9 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <hr>
             <div class="alert alert-warning">
                 💡 <strong>教學演練指引：</strong><br>
-                1. 建立一個簡單的 PHP 後門，例如 <code>&lt;?php system($_GET['cmd']); ?&gt;</code>，命名為 <code>shell.php</code>。<br>
-                2. 在此頁面上傳該檔案，上傳後點選上傳成功的連結。<br>
-                3. 在網址列後方加入 <code>?cmd=id</code> 或是 <code>?cmd=whoami</code>，即可在伺服器上執行系統命令！
+                1. <strong>WebShell 上傳</strong>：建立一個簡單的 PHP 後門，例如 <code>&lt;?php system($_GET['cmd']); ?&gt;</code>，命名為 <code>shell.php</code>。在此頁面上傳該檔案，上傳後點選連結，並在網址列後方加入 <code>?cmd=id</code> 即可執行系統命令！<br>
+                2. <strong>Upload DoS (上傳拒絕服務)</strong>：此上傳點未對上傳檔案的大小進行任何後端限制，亦未限制單一 Session 的上傳頻率與總空間。攻擊者可藉由上傳超大檔案（如數 GB 的大檔案）或發起高併發上傳請求，將伺服器的磁碟空間或網路頻寬耗盡，導致其他正常使用者無法使用系統，造成拒絕服務 (DoS) 攻擊。
             </div>
         </div>
     </div>

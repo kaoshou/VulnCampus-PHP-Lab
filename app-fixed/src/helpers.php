@@ -20,10 +20,28 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// 🟢 安全防護：會話閒置逾時 (Session Idle Timeout) 防範 Session 登入時間過長
+// 限制閒置時間為 10 分鐘 (600 秒)
+if (isset($_SESSION['user'])) {
+    $now = time();
+    if (isset($_SESSION['last_activity']) && ($now - $_SESSION['last_activity'] > 600)) {
+        session_unset();
+        session_destroy();
+        session_start();
+        $_SESSION['timeout_error'] = '您的會話已因閒置超過 10 分鐘而逾時，請重新登入！';
+        header("Location: /login.php");
+        exit;
+    }
+    $_SESSION['last_activity'] = $now; // 更新最後活動時間
+}
+
 // 輸出安全回應標頭 (Security Headers)
+header_remove("X-Powered-By");                                          // 移除 X-Powered-By 版本標頭
+header("Server: WebServer");                                            // 混淆 Server 版本資訊，防止版本洩漏
 header("X-Frame-Options: DENY");                                        // 防範點擊劫持 (Clickjacking)
 header("X-Content-Type-Options: nosniff");                              // 防範 MIME 類型嗅探
 header("Referrer-Policy: strict-origin-when-cross-origin");             // 限制 Referrer 洩漏
+header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload"); // 強制 HTTPS 連線 (HSTS)
 header("Content-Security-Policy: default-src 'self'; script-src 'self' https://code.jquery.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; frame-ancestors 'none';"); // 安全 CSP 防範 XSS 與 Frame 嵌入
 
 /**
@@ -96,6 +114,12 @@ function safe_redirect($url) {
  * 權限檢查 (包含登入與角色)
  */
 function check_auth($allowed_roles = []) {
+    // 安全防禦：對所有需要登入認證的敏感頁面，強制輸出停用瀏覽器快取 (Disable Caching) 標頭
+    // no-store 確保敏感個資絕對不會被寫入本機磁碟快取，防範共用電腦下的敏感資訊洩漏
+    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+    header("Pragma: no-cache");
+    header("Expires: 0");
+
     if (!isset($_SESSION['user'])) {
         header("Location: /login.php");
         exit;

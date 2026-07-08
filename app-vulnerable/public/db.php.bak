@@ -1,13 +1,8 @@
 <?php
-// ⚠️ 教學用弱點：這是系統開發時遺留的舊連線配置備份檔案 (db.php.bak)
-// 因為其副檔名非 .php，Apache 網頁伺服器會將其當作純文字直接傳送給瀏覽器下載，造成底層原始碼與機密帳密洩漏！
-
+// DATABASE CONNECTION CONFIGURATION BACKUP - CRITICAL SENSITIVE DATA
 $host = 'db';
 $db   = 'vuln_db';
 $user = 'root';
-$pass = 'rootpassword';
+$pass = 'root_password_123';
 $charset = 'utf8mb4';
-
-// 舊的測試連線設定...
-// $conn = new mysqli($host, $user, $pass, $db);
-echo "Database connection check: OK!";
+?>

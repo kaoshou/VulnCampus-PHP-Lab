@@ -28,7 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mime_type = $finfo->file($file_tmp);
         $allowed_mimes = ['image/jpeg', 'image/png', 'image/gif'];
 
-        if (!in_array($file_ext, $allowed_extensions)) {
+        // 修補重點 5：限制上傳檔案大小以防範 Upload DoS
+        $max_size = 2 * 1024 * 1024; // 最大 2MB
+        if ($_FILES['avatar']['size'] > $max_size) {
+            $error = '上傳失敗：檔案大小不能超過 2MB！';
+        } elseif (!in_array($file_ext, $allowed_extensions)) {
             $error = '上傳失敗：不允許的檔案格式！僅限 JPG, JPEG, PNG, GIF。';
         } elseif (!in_array($mime_type, $allowed_mimes)) {
             $error = '上傳失敗：檔案 MIME 類型不符，請勿嘗試偽造圖片檔案！';
@@ -54,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>上傳大頭貼 (安全版) - VulnCampus</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 </head>
 <body class="bg-light">
 
@@ -95,7 +99,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 1. <strong>副檔名白名單</strong>：僅允許 <code>jpg, jpeg, png, gif</code> 副檔名。<br>
                 2. <strong>MIME 類型檢測</strong>：利用 PHP <code>finfo</code> 來檢驗真實檔案特徵，防止將 PHP 後門重新命名為 <code>shell.png</code> 上傳繞過。<br>
                 3. <strong>檔名隨機化</strong>：上傳後的檔名會被改為亂數（如 <code>a4f3b...png</code>），攻擊者無法猜測檔名來直接存取 Webshell。<br>
-                4. <strong>執行權限限制</strong>：`/uploads` 目錄內配置有 Apache `.htaccess` 控制項，禁止解析任何 PHP 程式，確保即使有漏網之魚也無法在主機上執行命令。
+                4. <strong>執行權限限制</strong>：`/uploads` 目錄內配置有 Apache `.htaccess` 控制項，禁止解析任何 PHP 程式，確保即使有漏網之魚也無法在主機上執行命令。<br>
+                5. <strong>防範 Upload DoS</strong>：後端嚴格校驗 <code>$_FILES['avatar']['size']</code> 限制檔案大小不大於 2MB，防止攻擊者上傳多個超大檔案塞爆伺服器硬碟。
             </div>
         </div>
     </div>

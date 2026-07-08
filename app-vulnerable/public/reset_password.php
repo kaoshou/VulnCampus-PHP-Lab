@@ -56,8 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // 後端在此處雖然接收了 token，但在執行 UPDATE 前，卻「忘記比對」該 token 是否存在於 password_resets 中且有效！
                 // 甚至直接忽略了 Token 校驗，直接根據 username 更新密碼！
                 // 攻擊者只要發送包含 username 的 POST 請求，就算 token 為空，也能重設他人密碼！
-                $md5_pwd = md5($new_pwd);
-                $sql = "UPDATE users SET password_hash = '$md5_pwd' WHERE username = '$user_name'";
+                $sql = "UPDATE users SET password_hash = '$new_pwd' WHERE username = '$user_name'";
                 $pdo->exec($sql);
                 
                 $success = '密碼已成功重設，請使用新密碼重新登入！';

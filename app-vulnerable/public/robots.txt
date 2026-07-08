@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /debug.php
+Disallow: /db.php.bak
+Disallow: /index.php.old
+Disallow: /backup.zip
+Disallow: /reset_password.php
+Disallow: /api/

@@ -1,0 +1,2 @@
+# 漏洞配置：啟用目錄瀏覽 (Directory Listing) 讓學員與 ZAP 爬蟲可直接看到上傳的 webshell
+Options +Indexes

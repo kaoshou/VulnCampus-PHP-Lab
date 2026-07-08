@@ -3,13 +3,24 @@ require_once __DIR__ . '/../src/db.php';
 require_once __DIR__ . '/../src/helpers.php';
 
 $error = '';
+if (isset($_SESSION['timeout_error'])) {
+    $error = $_SESSION['timeout_error'];
+    unset($_SESSION['timeout_error']);
+}
+
+// 取出舊的驗證碼並清除（防重放攻擊）
+$captcha_answer = $_SESSION['captcha_answer'] ?? null;
+unset($_SESSION['captcha_answer']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
+    $user_captcha = trim($_POST['captcha'] ?? '');
 
     if ($username === '' || $password === '') {
         $error = '請填寫帳號與密碼。';
+    } elseif ($captcha_answer === null || (int)$user_captcha !== (int)$captcha_answer) {
+        $error = '驗證碼輸入錯誤，請重新輸入！';
     } else {
         try {
             // 修補重點 1：使用 Prepared Statements (參數化查詢) 防止 SQL 注入
@@ -90,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>帳號登入 (安全版) - VulnCampus</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         body { background-color: #f4f7f6; padding-top: 80px; }
         .form-signin { width: 100%; max-width: 400px; padding: 15px; margin: auto; }
@@ -115,6 +126,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group mb-3">
                 <label for="password" class="form-label font-weight-bold">密碼 (Password)</label>
                 <input type="password" name="password" id="password" class="form-control" required placeholder="請輸入密碼">
+            </div>
+            <div class="form-group mb-3">
+                <label for="captcha" class="form-label font-weight-bold">安全驗證碼 (Anti-Bot)</label>
+                <div class="input-group">
+                    <img src="/api/captcha.php" alt="CAPTCHA" id="captcha-img" class="border rounded-start" style="cursor: pointer; height: 38px;" title="點擊換一張" onclick="this.src='/api/captcha.php?'+Math.random()">
+                    <input type="text" name="captcha" id="captcha" class="form-control" required placeholder="請輸入驗證碼" autocomplete="off">
+                </div>
+                <small class="text-muted" style="font-size: 0.8rem;">看不清楚？點擊圖片可更換一張。</small>
             </div>
             <button class="btn btn-lg btn-primary w-100 font-weight-bold" type="submit">登入</button>
         </form>

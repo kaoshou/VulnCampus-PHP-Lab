@@ -11,7 +11,7 @@ check_auth(['admin']);
 <head>
     <meta charset="UTF-8">
     <title>管理員後台 (安全版) - VulnCampus</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <style>
         body { background-color: #f8f9fa; }
         .sidebar { background-color: #212529; min-height: 100vh; color: white; padding-top: 20px; }

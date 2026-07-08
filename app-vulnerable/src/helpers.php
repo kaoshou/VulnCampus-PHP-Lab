@@ -1,6 +1,11 @@
 <?php
 // 弱點版輔助函式：不加入任何安全標頭與 CSRF 防禦
 
+// 漏洞點：發送含有具體版本資訊的 Server 與 X-Powered-By 標頭 (Server Version Disclosure)
+header("Server: Apache/2.4.41 (Unix) OpenSSL/1.1.1d PHP/7.4.3");
+header("X-Powered-By: PHP/7.4.3");
+
+
 if (session_status() === PHP_SESSION_NONE) {
     // 弱點版：Session Cookie 未設定 HttpOnly 與 SameSite，極易被 XSS 竊取 Session ID
     session_start();
@@ -45,11 +50,9 @@ function write_audit_log($pdo, $action) {
     $user_id = $_SESSION['user']['id'] ?? null;
     $ip = $_SERVER['REMOTE_ADDR'] ?? '';
     $ua = $_SERVER['HTTP_USER_AGENT'] ?? '';
-    try {
-        $stmt = $pdo->prepare("INSERT INTO audit_logs (user_id, action, ip_address, user_agent) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$user_id, $action, $ip, $ua]);
-    } catch (PDOException $e) {
-        // 忽略 Exception
-    }
+    // 漏洞點：使用字串拼接直接將 User-Agent 與 IP 寫入日誌資料表，且未捕捉報錯，引發 HTTP Header SQL Injection (UA 注入)
+    $user_id_val = $user_id !== null ? intval($user_id) : 'NULL';
+    $sql = "INSERT INTO audit_logs (user_id, action, ip_address, user_agent) VALUES ($user_id_val, '$action', '$ip', '$ua')";
+    $pdo->exec($sql);
 }
 

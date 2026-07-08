@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+# 安全版：不使用 robots.txt 來隱藏敏感路徑（以防止洩漏敏感目錄），所有權限均在伺服器端通過 Session 驗證強制隔離。

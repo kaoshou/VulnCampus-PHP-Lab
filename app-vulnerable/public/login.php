@@ -8,44 +8,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    // 教學用弱點 1：登入邏輯使用字串拼接，且密碼以不安全的 MD5 雜湊比對，造成 SQL 注入與弱加密漏洞
+    // 教學用弱點 1：登入邏輯使用字串拼接，且密碼直接以不安全的明文比對，造成 SQL 注入與明文密碼漏洞
     // 您可以輸入 admin' -- 繞過密碼驗證
-    $md5_password = md5($password);
     
     try {
-        // 教學用弱點 2：直接拼接 SQL 語句
-        $sql = "SELECT * FROM users WHERE username = '$username'";
+        // 教學用弱點 2：直接拼接 SQL 語句 (同時拼接帳號與密碼，這是最經典的登入 SQLi 繞過情境)
+        // 這容許學員在 Username 中輸入 admin' -- 或是 ' or 1=1 -- 直接繞過登入
+        $sql = "SELECT * FROM users WHERE username = '$username' AND password_hash = '$password'";
         $stmt = $pdo->query($sql);
         $user = $stmt->fetch();
-
+ 
         if ($user) {
-            // 教學用弱點 3：詳細的登入錯誤訊息 (外洩帳號是否存在資訊)
-            if ($user['password_hash'] === $md5_password) {
-                // 登入成功
-                // 教學用弱點 4：登入成功後未呼叫 session_regenerate_id()，導致 Session Fixation 漏洞
-                $_SESSION['user'] = [
-                    'id' => $user['id'],
-                    'username' => $user['username'],
-                    'role' => $user['role'],
-                    'name' => $user['name']
-                ];
-                
-                // 記錄登入成功日誌
-                write_audit_log($pdo, "登入成功");
-
-                // 跳轉 (结合 redirect.php 的 Open Redirect，若有 url 參數直接轉向)
-                $goto = !empty($_GET['redirect']) ? $_GET['redirect'] : '/index.php';
-                header("Location: " . $goto);
-                exit;
-            } else {
-                $error = '密碼輸入錯誤。'; // 洩漏密碼錯誤資訊
-                // 呼叫日誌寫入，但由於弱點版過濾，此失敗日誌將不會被寫入庫中，展現紀錄失效缺失
-                write_audit_log($pdo, "登入失敗 (密碼錯誤)");
-            }
+            // 登入成功
+            // 教學用弱點 4：登入成功後未呼叫 session_regenerate_id()，導致 Session Fixation 漏洞
+            $_SESSION['user'] = [
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'role' => $user['role'],
+                'name' => $user['name']
+            ];
+            
+            // 記錄登入成功日誌
+            write_audit_log($pdo, "登入成功");
+ 
+            // 跳轉 (结合 redirect.php 的 Open Redirect，若有 url 參數直接轉向)
+            $goto = !empty($_GET['redirect']) ? $_GET['redirect'] : '/index.php';
+            header("Location: " . $goto);
+            exit;
         } else {
-            $error = '此帳號不存在。'; // 洩漏帳號不存在資訊
-            // 呼叫日誌寫入，但此失敗日誌同樣被忽略
-            write_audit_log($pdo, "登入失敗 (帳號不存在)");
+            // 教學用弱點 3：詳細的登入錯誤訊息 (外洩帳號是否存在資訊)
+            // 為了向學員展示資訊洩漏，我們在登入失敗時單獨檢索帳號是否存在
+            $check_sql = "SELECT * FROM users WHERE username = '$username'";
+            $check_stmt = $pdo->query($check_sql);
+            $check_user = $check_stmt->fetch();
+            if ($check_user) {
+                $error = '密碼輸入錯誤。'; // 洩漏密碼錯誤資訊
+                write_audit_log($pdo, "登入失敗 (密碼錯誤)");
+            } else {
+                $error = '此帳號不存在。'; // 洩漏帳號不存在資訊
+                write_audit_log($pdo, "登入失敗 (帳號不存在)");
+            }
         }
     } catch (PDOException $e) {
         // 教學用弱點 5：錯誤處理不當，直接將 SQL 報錯輸出在前端網頁上

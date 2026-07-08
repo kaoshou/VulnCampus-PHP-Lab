@@ -105,6 +105,33 @@ CREATE TABLE IF NOT EXISTS api_tokens (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS checkins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    latitude VARCHAR(50) NOT NULL,
+    longitude VARCHAR(50) NOT NULL,
+    memo TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS stored_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- 預存程序 (用於 Stored Procedure Injection 演示)
+DELIMITER //
+CREATE PROCEDURE get_course_details(IN course_id INT)
+BEGIN
+    SELECT id, title, classroom, credit, description FROM courses WHERE id = course_id;
+END //
+DELIMITER ;
+
+
+
+
 
 -- ==========================================
 -- 建立 fixed_db 的資料表 (結構相同，防護於程式端與邏輯端實現)
@@ -208,3 +235,29 @@ CREATE TABLE IF NOT EXISTS api_tokens (
     expires_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS checkins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    latitude VARCHAR(50) NOT NULL,
+    longitude VARCHAR(50) NOT NULL,
+    memo TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS stored_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- 預存程序 (用於 Stored Procedure Injection 演示)
+DELIMITER //
+CREATE PROCEDURE get_course_details(IN course_id INT)
+BEGIN
+    SELECT id, title, classroom, credit, description FROM courses WHERE id = course_id;
+END //
+DELIMITER ;
+
+

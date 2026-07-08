@@ -1,0 +1,11 @@
+<?php
+// OLD HOMEPAGE VERSION BEFORE 2026 REFACTORING
+// TODO: REMOVE THIS FROM PUBLIC DIRECTORY IN PRODUCTION!
+echo "<h2>VulnCampus Old Homepage (Backup)</h2>";
+echo "<p>Temporary landing page for testing database connectivity.</p>";
+$conn = new mysqli("db", "root", "root_password_123", "vuln_db");
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+echo "DB Connected Successfully!";
+?>

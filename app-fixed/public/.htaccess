@@ -1,0 +1,5 @@
+# 🟢 安全配置：禁止目錄瀏覽 (Disable Directory Listing)
+Options -Indexes
+
+# 🟢 安全配置：拒絕存取任何以點 (.) 開頭的隱藏目錄與檔案（如 .git, .env 等）
+RedirectMatch 403 /\..*$

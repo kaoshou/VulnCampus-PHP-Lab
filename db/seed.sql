@@ -3,14 +3,12 @@
 -- ==========================================
 USE vuln_db;
 
--- 插入使用者 (密碼為 MD5 雜湊)
--- password123 的 MD5: 5f4dcc3b5aa765d61d8327deb882cf99
--- admin 的 MD5: 21232f297a57a5a743894a0e4a801fc3
+-- 插入使用者 (弱點版：密碼直接以明文儲存)
 INSERT INTO users (id, username, password_hash, role, name, email, phone, student_no, national_id_fake) VALUES
-(1, 'admin', '21232f297a57a5a743894a0e4a801fc3', 'admin', '系統管理員', 'admin@vulncampus.local', '0912-345-678', 'AD001', 'A123456789'),
-(2, 'student01', '5f4dcc3b5aa765d61d8327deb882cf99', 'student', '王小明', 'student01@vulncampus.local', '0922-111-222', 'ST001', 'B198765432'),
-(3, 'student02', '5f4dcc3b5aa765d61d8327deb882cf99', 'student', '李小美', 'student02@vulncampus.local', '0933-222-333', 'ST002', 'F299887766'),
-(4, 'teacher01', '5f4dcc3b5aa765d61d8327deb882cf99', 'teacher', '張教授', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
+(1, 'admin', 'admin', 'admin', '系統管理員', 'admin@vulncampus.local', '0912-345-678', 'AD001', 'A123456789'),
+(2, 'student01', 'password123', 'student', '王小明', 'student01@vulncampus.local', '0922-111-222', 'ST001', 'B198765432'),
+(3, 'student02', 'password123', 'student', '李小美', 'student02@vulncampus.local', '0933-222-333', 'ST002', 'F299887766'),
+(4, 'teacher01', 'password123', 'teacher', '張教授', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
 
 -- 插入課程資料
 INSERT INTO courses (id, title, teacher_id, description, classroom, credit) VALUES
@@ -44,6 +42,17 @@ INSERT INTO messages (id, user_id, username_display, title, content) VALUES
 INSERT INTO api_tokens (id, user_id, token, expires_at) VALUES
 (1, 2, 'student01-api-token-vuln-12345', '2030-12-31 23:59:59');
 
+-- 插入打卡測試資料
+INSERT INTO checkins (id, user_id, latitude, longitude, memo) VALUES
+(1, 2, '25.046891', '121.516906', '王小明在台北車站打卡'),
+(2, 3, '25.033964', '121.564468', '李小美在台北101大樓打卡');
+
+-- 插入專屬儲存型 XSS 留言
+INSERT INTO stored_messages (id, name, content) VALUES
+(1, '系統管理員', '歡迎來到專屬預存型 XSS 演練頁面！');
+
+
+
 
 -- ==========================================
 -- 寫入 fixed_db 的初始種子資料
@@ -52,10 +61,10 @@ USE fixed_db;
 
 -- 插入使用者 (密碼為 Bcrypt 雜湊，預設為 password123)
 -- Bcrypt of password123: $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
--- admin 密碼使用較複雜的：AdminPassword!2026
--- Bcrypt of AdminPassword!2026: $2y$10$r9G.8H/s20jVp1w0c.YhA.L5X3P05lV4X.e/h4G5aQ.oFz81gEpeS
+-- admin 密碼使用：admin (Bcrypt 雜湊以供便利測試)
+-- Bcrypt of admin: $2y$10$DC5a9K69M5pjQTSooboor.s39OZxKTfeawBo0mu9w8VSpy27EyFDK
 INSERT INTO users (id, username, password_hash, role, name, email, phone, student_no, national_id_fake) VALUES
-(1, 'admin', '$2y$10$r9G.8H/s20jVp1w0c.YhA.L5X3P05lV4X.e/h4G5aQ.oFz81gEpeS', 'admin', '系統管理員', 'admin@vulncampus.local', '0912-345-678', 'AD001', 'A123456789'),
+(1, 'admin', '$2y$10$DC5a9K69M5pjQTSooboor.s39OZxKTfeawBo0mu9w8VSpy27EyFDK', 'admin', '系統管理員', 'admin@vulncampus.local', '0912-345-678', 'AD001', 'A123456789'),
 (2, 'student01', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '王小明', 'student01@vulncampus.local', '0922-111-222', 'ST001', 'B198765432'),
 (3, 'student02', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '李小美', 'student02@vulncampus.local', '0933-222-333', 'ST002', 'F299887766'),
 (4, 'teacher01', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'teacher', '張教授', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
@@ -90,3 +99,14 @@ INSERT INTO messages (id, user_id, username_display, title, content) VALUES
 -- 插入預設的 API Token (student01 測試用)
 INSERT INTO api_tokens (id, user_id, token, expires_at) VALUES
 (1, 2, 'student01-api-token-fixed-abcde', '2030-12-31 23:59:59');
+
+-- 插入打卡測試資料
+INSERT INTO checkins (id, user_id, latitude, longitude, memo) VALUES
+(1, 2, '25.046891', '121.516906', '王小明在台北車站打卡'),
+(2, 3, '25.033964', '121.564468', '李小美在台北101大樓打卡');
+
+-- 插入專屬儲存型 XSS 留言
+INSERT INTO stored_messages (id, name, content) VALUES
+(1, '系統管理員', '歡迎來到專屬預存型 XSS 演練頁面！');
+
+
