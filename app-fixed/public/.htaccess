@@ -3,3 +3,7 @@ Options -Indexes
 
 # 🟢 安全配置：拒絕存取任何以點 (.) 開頭的隱藏目錄與檔案（如 .git, .env 等）
 RedirectMatch 403 /\..*$
+
+# 🟢 安全配置：配置自訂錯誤頁面防範資訊外洩 (CWE-756)
+ErrorDocument 404 /error_404.php
+ErrorDocument 500 /error_500.php

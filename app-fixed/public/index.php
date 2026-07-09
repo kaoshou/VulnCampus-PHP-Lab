@@ -317,6 +317,24 @@ require_once __DIR__ . '/../src/helpers.php';
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-success">💥 緩衝區溢位 (雙重安全防護)</h5>
+                            <p class="card-text text-muted flex-grow-1">後端限制輸入字串長度，且底層 C 程式改用 strncpy 進行字串拷貝，徹底防範記憶體溢位漏洞。</p>
+                            <a href="/buffer_overflow.php" class="btn btn-outline-primary mt-2">進入緩衝區溢位演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-success">📷 EXIF 中繼資料防護 (參數化與轉義)</h5>
+                            <p class="card-text text-muted flex-grow-1">讀取圖片 EXIF 中繼資料時，使用參數化查詢寫入，並於前端使用 htmlspecialchars 進行實體轉義編碼，徹底防範 SQLi 與 XSS。</p>
+                            <a href="/exif_vulnerability.php" class="btn btn-outline-primary mt-2">進入 EXIF 注入演練</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

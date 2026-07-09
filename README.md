@@ -102,6 +102,7 @@ vuln-campus-php-lab/
 8. **A08:2025 Data Integrity Failures**：修改資料隱藏欄位 `role=user` 竄改 (Mass Assignment)。
 9. **A09:2025 Logging Failures**：無系統稽核日誌 (安全版已寫入 `audit_logs` 並提供後台檢視)。
 10. **A10:2025 Mishandling Exceptions**：資料庫 Exception 直接噴在網頁畫面上。
+11. **補充演練 - 緩衝區溢位 (Buffer Overflow)**：呼叫底層 C 語言二進位程式，輸入超長字串引發記憶體溢位與系統崩潰 (SIGSEGV 退出碼 139)。
 
 ---
 
@@ -115,3 +116,12 @@ vuln-campus-php-lab/
    - 報名活動時，手動將數量欄位修改為 `-1`，驗證報名結餘金額。
 5. **程式修補與重新檢測**：對比 `app-vulnerable` 與 `app-fixed` 的程式碼設計差異（可參閱代碼中的 `// 教學用弱點` 與 `// 修補重點` 註解）。
 6. **防護驗證**：利用 ZAP 掃描修正版 `http://localhost:8081`，觀察 Alerts 中高/中風險的弱點已完全消除。
+
+---
+
+## 👤 作者與專案資訊
+
+- **專案名稱**：VulnCampus PHP Lab (校園活動與課程報名平台教學靶場)
+- **內容設計**：崑山科科技大學 鄭郁翰 老師
+- **適用課程**：網站弱點檢測與安全改善、OWASP ZAP 應用實務、安全程式碼編寫 (Secure Coding)
+- **專案目的**：專為教學與學術研究設計的 Web 漏洞修補對照靶場，嚴禁部署於公開網路。

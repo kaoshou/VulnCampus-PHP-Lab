@@ -28,8 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'name' => $user['name']
             ];
             
-            // 記錄登入成功日誌
-            write_audit_log($pdo, "登入成功");
+            // 記錄登入成功日誌 (CWE-532：寫入明文密碼等敏感資訊)
+            write_audit_log($pdo, "登入成功 (Username: $username, Password: $password)");
  
             // 跳轉 (结合 redirect.php 的 Open Redirect，若有 url 參數直接轉向)
             $goto = !empty($_GET['redirect']) ? $_GET['redirect'] : '/index.php';
@@ -43,10 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $check_user = $check_stmt->fetch();
             if ($check_user) {
                 $error = '密碼輸入錯誤。'; // 洩漏密碼錯誤資訊
-                write_audit_log($pdo, "登入失敗 (密碼錯誤)");
             } else {
                 $error = '此帳號不存在。'; // 洩漏帳號不存在資訊
-                write_audit_log($pdo, "登入失敗 (帳號不存在)");
             }
         }
     } catch (PDOException $e) {

@@ -121,6 +121,22 @@ CREATE TABLE IF NOT EXISTS stored_messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS exif_photos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    artist VARCHAR(255) NULL,
+    model VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS stolen_cookies (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cookie_data TEXT NOT NULL,
+    ip_address VARCHAR(50) NULL,
+    user_agent VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
 -- 預存程序 (用於 Stored Procedure Injection 演示)
 DELIMITER //
 CREATE PROCEDURE get_course_details(IN course_id INT)
@@ -249,6 +265,22 @@ CREATE TABLE IF NOT EXISTS stored_messages (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,
     content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS exif_photos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    filename VARCHAR(255) NOT NULL,
+    artist VARCHAR(255) NULL,
+    model VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS stolen_cookies (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    cookie_data TEXT NOT NULL,
+    ip_address VARCHAR(50) NULL,
+    user_agent VARCHAR(255) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 

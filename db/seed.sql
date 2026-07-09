@@ -8,7 +8,7 @@ INSERT INTO users (id, username, password_hash, role, name, email, phone, studen
 (1, 'admin', 'admin', 'admin', '系統管理員', 'admin@vulncampus.local', '0912-345-678', 'AD001', 'A123456789'),
 (2, 'student01', 'password123', 'student', '王小明', 'student01@vulncampus.local', '0922-111-222', 'ST001', 'B198765432'),
 (3, 'student02', 'password123', 'student', '李小美', 'student02@vulncampus.local', '0933-222-333', 'ST002', 'F299887766'),
-(4, 'teacher01', 'password123', 'teacher', '張教授', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
+(4, 'teacher01', 'password123', 'teacher', '鄭老師', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
 
 -- 插入課程資料
 INSERT INTO courses (id, title, teacher_id, description, classroom, credit) VALUES
@@ -36,7 +36,7 @@ INSERT INTO files (id, owner_user_id, filename, storage_path, is_public) VALUES
 -- 插入留言板測試資料
 INSERT INTO messages (id, user_id, username_display, title, content) VALUES
 (1, 2, '王小明', '請教老師', '老師好，請問下週的資安挑戰賽在哪裡舉行？'),
-(2, 4, '張教授', '回覆：請教老師', '你好，挑戰賽將在資科館 301 電腦教室舉行。');
+(2, 4, '鄭老師', '回覆：請教老師', '你好，挑戰賽將在資科館 301 電腦教室舉行。');
 
 -- 插入預設的 API Token (student01 測試用)
 INSERT INTO api_tokens (id, user_id, token, expires_at) VALUES
@@ -67,7 +67,7 @@ INSERT INTO users (id, username, password_hash, role, name, email, phone, studen
 (1, 'admin', '$2y$10$DC5a9K69M5pjQTSooboor.s39OZxKTfeawBo0mu9w8VSpy27EyFDK', 'admin', '系統管理員', 'admin@vulncampus.local', '0912-345-678', 'AD001', 'A123456789'),
 (2, 'student01', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '王小明', 'student01@vulncampus.local', '0922-111-222', 'ST001', 'B198765432'),
 (3, 'student02', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '李小美', 'student02@vulncampus.local', '0933-222-333', 'ST002', 'F299887766'),
-(4, 'teacher01', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'teacher', '張教授', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
+(4, 'teacher01', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'teacher', '鄭老師', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
 
 -- 插入課程資料
 INSERT INTO courses (id, title, teacher_id, description, classroom, credit) VALUES
@@ -94,7 +94,7 @@ INSERT INTO files (id, owner_user_id, filename, storage_path, is_public) VALUES
 -- 插入留言板測試資料
 INSERT INTO messages (id, user_id, username_display, title, content) VALUES
 (1, 2, '王小明', '請教老師', '老師好，請問下週的資安挑戰賽在哪裡舉行？'),
-(2, 4, '張教授', '回覆：請教老師', '你好，挑戰賽將在資科館 301 電腦教室舉行。');
+(2, 4, '鄭老師', '回覆：請教老師', '你好，挑戰賽將在資科館 301 電腦教室舉行。');
 
 -- 插入預設的 API Token (student01 測試用)
 INSERT INTO api_tokens (id, user_id, token, expires_at) VALUES

@@ -99,6 +99,17 @@ try {
                     </form>
                 </div>
             </div>
+
+            <div class="card shadow-sm border-success mt-3 bg-white">
+                <div class="card-header bg-success text-white font-weight-bold">
+                    🛡️ XSS Cookie 竊取防禦對照
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">本安全版因為在 <code>helpers.php</code> 中對 Session Cookie 配置了 <code>httponly: true</code> 屬性。</p>
+                    <p class="small text-muted">即使網頁遭受 XSS 注入攻擊，JavaScript 也完全無法讀取到 Session Cookie，將只會傳送空字串給收集箱。</p>
+                    <a href="/cookie_stealer.php" target="_blank" class="btn btn-sm btn-outline-success w-100 font-weight-bold">📋 開啟 Cookie 收集箱 (對照組) ➔</a>
+                </div>
+            </div>
         </div>
 
         <!-- 歷史留言列表 -->

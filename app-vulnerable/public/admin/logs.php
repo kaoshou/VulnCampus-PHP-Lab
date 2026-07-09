@@ -5,6 +5,13 @@ require_once __DIR__ . '/../../src/helpers.php';
 // 教學用弱點 1：後台頁面權限控制缺失 (Broken Access Control)
 check_login();
 
+// 模擬使用 Switch 分配權限 (CWE-484: 漏寫 break 導致 student 越權)
+$perms = get_user_permissions($_SESSION['user']['role'] ?? '');
+if (!in_array('admin_access', $perms)) {
+    http_response_code(403);
+    die("🚫 存取拒絕！您的角色 (" . htmlspecialchars($_SESSION['user']['role']) . ") 無法進入後台日誌區。");
+}
+
 $logs = [];
 $error = '';
 

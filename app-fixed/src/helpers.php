@@ -172,3 +172,24 @@ function write_audit_log($pdo, $action) {
         error_log("Failed to write audit log: " . $e->getMessage());
     }
 }
+
+/**
+ * 根據使用者角色獲取權限 (CWE-484 安全修補：補上 break 語句防止越權)
+ */
+function get_user_permissions($role) {
+    $permissions = [];
+    switch ($role) {
+        case 'student':
+            $permissions[] = 'view_courses';
+            break; // 安全修補
+        case 'teacher':
+            $permissions[] = 'view_registrations';
+            break; // 安全修補
+        case 'admin':
+            $permissions[] = 'admin_access';
+            break;
+        default:
+            $permissions[] = 'guest_access';
+    }
+    return $permissions;
+}

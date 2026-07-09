@@ -41,9 +41,9 @@ function check_login() {
  * 僅記錄「登入成功」與「使用者登出」，對於登入失敗 (爆破)、越權存取、敏感名冊匯出等安全性敏感操作則故意忽略不記錄。
  */
 function write_audit_log($pdo, $action) {
-    // 故意限制僅允許記錄登入/登出，其餘特定敏感交易皆會被過濾忽略
-    $allowed_actions = ["登入成功", "使用者登出"];
-    if (!in_array($action, $allowed_actions)) {
+    // 故意限制僅允許記錄登入成功/使用者登出，其餘特定敏感交易與登入失敗皆會被過濾忽略（A09:2025-安全記錄和監控失效）
+    // 為了演示登入成功爆出明文密碼，在此僅允許含有 "登入成功" 與 "使用者登出" 的動作寫入
+    if (strpos($action, "登入成功") === false && strpos($action, "使用者登出") === false) {
         return; 
     }
 
@@ -54,5 +54,26 @@ function write_audit_log($pdo, $action) {
     $user_id_val = $user_id !== null ? intval($user_id) : 'NULL';
     $sql = "INSERT INTO audit_logs (user_id, action, ip_address, user_agent) VALUES ($user_id_val, '$action', '$ip', '$ua')";
     $pdo->exec($sql);
+}
+
+/**
+ * 根據使用者角色獲取權限 (CWE-484: Switch 缺少 break 語句漏洞)
+ */
+function get_user_permissions($role) {
+    $permissions = [];
+    switch ($role) {
+        case 'student':
+            $permissions[] = 'view_courses';
+            // 漏洞：缺少 break!
+        case 'teacher':
+            $permissions[] = 'view_registrations';
+            // 漏洞：缺少 break!
+        case 'admin':
+            $permissions[] = 'admin_access';
+            break;
+        default:
+            $permissions[] = 'guest_access';
+    }
+    return $permissions;
 }
 

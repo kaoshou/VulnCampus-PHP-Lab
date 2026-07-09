@@ -335,6 +335,24 @@ require_once __DIR__ . '/../src/helpers.php';
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">💥 底層緩衝區溢位 (Buffer Overflow)</h5>
+                            <p class="card-text">呼叫底層 C 語言編寫的二進位程式，利用 strcpy 漏洞覆寫記憶體堆疊，觸發服務崩潰與 SIGSEGV 錯誤。</p>
+                            <a href="/buffer_overflow.php" class="btn btn-primary">進入緩衝區溢位演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📷 EXIF 中繼資料注入 (EXIF Injection)</h5>
+                            <p class="card-text">讀取圖片 EXIF 中繼資料，但在寫入 SQL 或前端網頁輸出時未做防護，引發 SQL 注入與 Stored XSS 攻擊。</p>
+                            <a href="/exif_vulnerability.php" class="btn btn-primary">進入 EXIF 注入演練</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

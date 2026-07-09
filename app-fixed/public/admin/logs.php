@@ -5,6 +5,13 @@ require_once __DIR__ . '/../../src/helpers.php';
 // 修補重點 1：嚴格後台權限檢查
 check_auth(['admin']);
 
+// 另外以 get_user_permissions 檢驗（對照防範 CWE-484）
+$perms = get_user_permissions($_SESSION['user']['role'] ?? '');
+if (!in_array('admin_access', $perms)) {
+    http_response_code(403);
+    die("🚫 存取拒絕！您的角色 (" . h($_SESSION['user']['role']) . ") 無法進入後台日誌區。");
+}
+
 $logs = [];
 $error = '';
 

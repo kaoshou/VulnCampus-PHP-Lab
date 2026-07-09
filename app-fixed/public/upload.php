@@ -96,8 +96,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <hr>
             <div class="alert alert-success">
                 🛡️ <strong>安全防禦說明：</strong><br>
-                1. <strong>副檔名白名單</strong>：僅允許 <code>jpg, jpeg, png, gif</code> 副檔名。<br>
-                2. <strong>MIME 類型檢測</strong>：利用 PHP <code>finfo</code> 來檢驗真實檔案特徵，防止將 PHP 後門重新命名為 <code>shell.png</code> 上傳繞過。<br>
+                1. <strong>副檔名白名單</strong>：僅允許 <code>jpg, jpeg, png, gif</code> 副檔名。這使得任何透過 ZAP 攔截並繞過前端將檔名改回 <code>.php</code> 的嘗試，都會在後端被直接拒絕。<br>
+                2. <strong>MIME 類型檢測</strong>：利用 PHP <code>finfo</code> (FILEINFO_MIME_TYPE) 讀取檔案內部二進位特徵，而不是相信 Request 標頭中的 <code>Content-Type</code>。因此即使攻擊者手動將 PHP 後門的 Content-Type 改為 <code>image/png</code> 繞過，依然會被偵測並攔截。<br>
                 3. <strong>檔名隨機化</strong>：上傳後的檔名會被改為亂數（如 <code>a4f3b...png</code>），攻擊者無法猜測檔名來直接存取 Webshell。<br>
                 4. <strong>執行權限限制</strong>：`/uploads` 目錄內配置有 Apache `.htaccess` 控制項，禁止解析任何 PHP 程式，確保即使有漏網之魚也無法在主機上執行命令。<br>
                 5. <strong>防範 Upload DoS</strong>：後端嚴格校驗 <code>$_FILES['avatar']['size']</code> 限制檔案大小不大於 2MB，防止攻擊者上傳多個超大檔案塞爆伺服器硬碟。
