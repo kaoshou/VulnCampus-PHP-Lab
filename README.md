@@ -43,6 +43,12 @@ docker compose down -v
 docker compose up -d --build
 ```
 
+## 🛡️ 安全掛載與演練隔離防護 (Docker Volumes)
+
+為了避免學員在正式演練中上傳惡意檔案或 Webshell 覆蓋真實檔案，本靶場配置了雙重安全防護：
+1. **容器內唯讀掛載 (`:ro`)**：網頁程式碼目錄在容器內部為唯讀屬性。學員的後門 Webshell 無法篡改或覆蓋本地實體檔案；但當您在本機（宿主機）使用編輯器（如 VS Code）修改代碼時，變更依然會即時同步並在網頁上生效。
+2. **上傳目錄虛擬化隔離**：圖片與大頭貼上傳目錄 (`uploads/`) 被單獨隔離掛載至 Docker 內部虛擬命名磁碟卷中（`vuln-vulnerable-uploads` 與 `vuln-fixed-uploads`）。學員上傳的 Webshell 僅會存留在 Docker 的虛擬空間，完全不會污染或寫入您的本機實體專案目錄，確保主機安全。
+
 ---
 
 ## 🔑 測試帳號與密碼對照表
@@ -92,11 +98,11 @@ vuln-campus-php-lab/
 
 本靶場包含以下精確設計的漏洞，學員可在 **弱點版 (Port 8080)** 進行攻擊檢測，並在 **修正版 (Port 8081)** 驗證防護：
 
-1. **A01:2025 Broken Access Control**：`profile.php?id=X` (IDOR)、未授權匯出名冊及審核 API。
+1. **A01:2025 Broken Access Control**：`profile.php?id=X` (IDOR)、未授權匯出名冊、審核 API、`hidden_control.php` (客戶端安全控制缺失) 及 `switch_defect.php` (Switch case 缺少 break 越權)。
 2. **A02:2025 Security Misconfiguration**：缺失安全回應標頭、Cookie 缺少 HttpOnly 標記、`debug.php` 暴露配置。
 3. **A03:2025 Supply Chain Failures**：引入漏洞舊版前端套件 (jQuery 1.12.4 / Bootstrap 4.0.0)。
-4. **A04:2025 Cryptographic Failures**：MD5 密碼雜湊、可預測的 MD5 密碼重設 Token、Base64 儲存假個資。
-5. **A05:2025 Injection**：課程查詢 SQL Injection、Stored/Reflected XSS、`download.php` Path Traversal、後台命令注入。
+4. **A04:2025 Cryptographic Failures**：MD5 密碼雜湊、可預測的 MD5 密碼重設 Token、Base64 儲存假個資、`cookie_sensitive.php` (明文 Cookie 敏感資訊) 及 `cve_2025_7783.php` (弱隨機 Boundary 生成)。
+5. **A05:2025 Injection**：課程查詢 SQL Injection、Stored/Reflected XSS、`download.php` Path Traversal、後台命令注入、`command_injection.php` (命令注入專屬頁面)、`eval_injection.php` (Eval 代碼注入)、`xpath_injection.php` (XPath 注入) 及 `crlf_injection.php` (CRLF 響應分裂注入)。
 6. **A06:2025 Insecure Design**：活動名額併發 Race Condition 超賣、報名數量可輸入負數、優惠券重複使用限制失效。
 7. **A07:2025 Authentication Failures**：弱密碼、帳密提示錯誤細節 (帳號列舉)、Session Fixation、無登入次數限制。
 8. **A08:2025 Data Integrity Failures**：修改資料隱藏欄位 `role=user` 竄改 (Mass Assignment)。

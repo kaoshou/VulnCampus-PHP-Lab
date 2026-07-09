@@ -153,7 +153,10 @@ require_once __DIR__ . '/../src/helpers.php';
         <!-- 系統功能選單 -->
         <div class="col-md-8">
             <h3 class="mb-4">系統功能測試頁面</h3>
-            <div class="row">
+
+            <!-- 第一類：輸入驗證與過濾漏洞 -->
+            <h5 class="text-orange mb-3 border-bottom pb-2">🛡️ 第一類：伺服器端注入與解析漏洞 (Server-Side Injection & Parsing)</h5>
+            <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
@@ -166,53 +169,7 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">📦 第三方套件與經典元件漏洞</h5>
-                            <p class="card-text">展示 PHP 反序列化漏洞 (Object Injection)、PHPMailer RCE，與 Log4Shell 漏洞之模擬與防禦對照。</p>
-                            <a href="/component_vulnerabilities.php" class="btn btn-primary">進入不安全元件演練</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">📖 專屬：反射型 XSS 測試頁</h5>
-                            <p class="card-text">單純的搜尋關鍵字回顯頁面，用於測試反射型 XSS 漏洞的輸入與輸出。</p>
-                            <a href="/xss_reflected.php" class="btn btn-primary">進入反射型 XSS</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">💬 專屬：預存型 XSS 測試頁</h5>
-                            <p class="card-text">單純的訪客留言反饋頁面，內容寫入資料庫，用於測試儲存型 XSS 漏洞。</p>
-                            <a href="/xss_stored.php" class="btn btn-primary">進入預存型 XSS</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">🌐 專屬：DOM-based XSS 測試頁</h5>
-                            <p class="card-text">利用 location.hash 及 innerHTML 渲染，用於專門測試前端 DOM-based XSS。</p>
-                            <a href="/xss_dom.php" class="btn btn-primary">進入 DOM-based XSS</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">📋 不安全 HTML 表單配置</h5>
-                            <p class="card-text">敏感資料以 GET 傳送、自動完成啟用，且後端未校驗 Email、選單與型態等欄位風險。</p>
-                            <a href="/form_risks.php" class="btn btn-primary">進入表單風險演練</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">📖 課程查詢系統</h5>
+                            <h5 class="card-title">📖 課程查詢系統 (SQL 注入實戰)</h5>
                             <p class="card-text">提供全校課程的即時搜尋，可用於演練 SQL 注入 (SQLi) 拖出整個使用者資料庫。</p>
                             <a href="/courses.php" class="btn btn-primary">進入課程查詢</a>
                         </div>
@@ -221,117 +178,9 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">📅 活動報名 (安全設計缺陷)</h5>
-                            <p class="card-text">可在此測試商業邏輯漏洞，例如數量輸入負數、前端價格竄改等缺陷。</p>
-                            <a href="/events.php" class="btn btn-primary">進入活動列表</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">👤 個人資料 (IDOR / 越權)</h5>
-                            <p class="card-text">修改或查詢個人資訊，可用於測試 IDOR 水平越權與 Mass Assignment 漏洞。</p>
-                            <a href="/profile.php" class="btn btn-primary">進入個人資料</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">📤 大頭貼上傳 (任意檔案上傳)</h5>
-                            <p class="card-text">提供使用者上傳大頭貼的功能，允許上傳 .php 網頁後門執行 Command。</p>
-                            <a href="/upload.php" class="btn btn-primary">前往上傳大頭貼</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
                             <h5 class="card-title">📂 檔案引入漏洞 (LFI / RFI)</h5>
-                            <p class="card-text">動態加載模組檔案，但未限制路徑。可用於測試本地檔案引入與遠端惡意程式碼執行。</p>
+                            <p class="card-text">動態加載模組檔案，但未限制路徑。可用於測試本地檔案引入與遠端檔案引入 RCE。</p>
                             <a href="/file_inclusion.php" class="btn btn-primary">進入檔案引入演練</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">📥 檔案下載 (Path Traversal)</h5>
-                            <p class="card-text">透過檔案路徑下載公開或私密檔案，可用於測試路徑遍歷漏洞。</p>
-                            <a href="/download.php" class="btn btn-primary">前往檔案下載</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">🖼️ 圖片檢視器 (路徑穿越漏洞)</h5>
-                            <p class="card-text">利用圖片顯示端點，在沒有安全路徑過濾下，嘗試讀取資料庫帳密或系統設定檔。</p>
-                            <a href="/image_viewer.php" class="btn btn-primary">進入圖片檢視器</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">🔑 密碼重設 (邏輯缺陷)</h5>
-                            <p class="card-text">測試密碼重設流程的安全性缺陷，了解如何免驗證重設他人密碼。</p>
-                            <a href="/reset_password.php" class="btn btn-primary">前往密碼重設</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">🔗 網址轉向 (Open Redirect)</h5>
-                            <p class="card-text">系統內部跳轉功能未做過濾，可用於進行釣魚攻擊與 Open Redirect 測試。</p>
-                            <a href="/redirect.php?url=courses.php" class="btn btn-primary">測試網址轉向</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">📍 行動定位打卡 (HTML5 / localStorage)</h5>
-                            <p class="card-text">使用 HTML5 Geolocation 打卡，並將資訊存於 localStorage。可用於測試定位隱私洩漏 (IDOR) 與 DOM XSS。</p>
-                            <a href="/checkin.php" class="btn btn-primary">前往打卡頁面</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">🎯 點擊劫持 (Clickjacking / iframe 漏洞)</h5>
-                            <p class="card-text">外部網站利用透明 iframe 覆蓋本站敏感按鈕，誘騙已登入的使用者進行非預期點擊操作。</p>
-                            <a href="/clickjacking_poc.php" class="btn btn-primary">進入點擊劫持演練</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">🔍 自訂個資洩漏與 ZAP 腳本檢測</h5>
-                            <p class="card-text">明文暴露身分證、電話等敏感個資，並提供 ZAP 被動腳本代碼讓學員實作自訂 Regex 規則報警。</p>
-                            <a href="/pii_leakage.php" class="btn btn-primary">進入個資檢測演練</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">🎨 版面主題色自訂 (CSS Injection)</h5>
-                            <p class="card-text">允許使用者填入自訂 CSS 以調整個人版面樣式。可用於測試 CSS 注入漏洞與繞過。</p>
-                            <a href="/css_injection.php" class="btn btn-primary">進入主題自訂</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="card-title">⚡ AJAX 查詢 (BOLA / IDOR / XSS)</h5>
-                            <p class="card-text">異步 AJAX 獲取個資系統，可用於測試 API 權限缺陷、個資過度暴露與 DOM-based XSS 漏洞。</p>
-                            <a href="/ajax_vulnerability.php" class="btn btn-primary">進入 AJAX 測試</a>
                         </div>
                     </div>
                 </div>
@@ -356,9 +205,196 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">💥 底層緩衝區溢位 (Buffer Overflow)</h5>
-                            <p class="card-text">呼叫底層 C 語言編寫的二進位程式，利用 strcpy 漏洞覆寫記憶體堆疊，觸發服務崩潰與 SIGSEGV 錯誤。</p>
-                            <a href="/buffer_overflow.php" class="btn btn-primary">進入緩衝區溢位演練</a>
+                            <h5 class="card-title">💻 系統命令注入 (Command Injection)</h5>
+                            <p class="card-text">網路診斷 Ping 工具，直接將使用者輸入的 IP 拼接至 shell 命令執行，可用於演練拼接分號或管道符執行系統命令。</p>
+                            <a href="/command_injection.php" class="btn btn-primary">進入命令注入演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🌐 XPath 注入漏洞 (CWE-643)</h5>
+                            <p class="card-text">模擬學員資料 XML 查詢系統，後端直接將帳號變數拼接入 XPath 語法進行檢索，學員可演練如何利用邏輯運算子拖出整份 XML 隱私數據。</p>
+                            <a href="/xpath_injection.php" class="btn btn-primary">進入 XPath 注入演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🌐 CRLF 注入 / HTTP 標頭注入 (CWE-93)</h5>
+                            <p class="card-text">跳轉 URL 診斷工具，未對換行字元 %0d%0a 進行過濾，學員可演練如何注入自訂 Response Header 以強植 Cookie。</p>
+                            <a href="/crlf_injection.php" class="btn btn-primary">進入 CRLF 注入演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">⚙️ Eval 程式碼注入 (CWE-95)</h5>
+                            <p class="card-text">智能計算機工具，直接將算式變數傳入 eval() 執行，學員可演練如何藉此執行任意 PHP 函數以達成 RCE。</p>
+                            <a href="/eval_injection.php" class="btn btn-primary">進入 Eval 注入演練</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 第二類：跨站腳本與前端控制失效 -->
+            <h5 class="text-orange mb-3 border-bottom pb-2">💬 第二類：跨站腳本與前端控制失效 (XSS & Client-Side Failures)</h5>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📖 反射型 XSS 測試頁</h5>
+                            <p class="card-text">單純的搜尋關鍵字回顯頁面，用於測試反射型 XSS 漏洞的輸入與輸出。</p>
+                            <a href="/xss_reflected.php" class="btn btn-primary">進入反射型 XSS</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">💬 預存型 XSS 測試頁</h5>
+                            <p class="card-text">單純的訪客留言反饋頁面，內容寫入資料庫，用於測試儲存型 XSS 漏洞。</p>
+                            <a href="/xss_stored.php" class="btn btn-primary">進入預存型 XSS</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🌐 DOM-based XSS 測試頁</h5>
+                            <p class="card-text">利用 location.hash 及 innerHTML 渲染，用於專門測試前端 DOM-based XSS。</p>
+                            <a href="/xss_dom.php" class="btn btn-primary">進入 DOM-based XSS</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📄 PDF 嵌入跨站腳本 (PDF-based XSS)</h5>
+                            <p class="card-text">上傳成果 PDF 預覽，整合 PDF.js 漏洞版本，演練免點擊 (CVE-2024-4367) 與點擊式 XSS。</p>
+                            <a href="/pdf_xss_demo.php" class="btn btn-primary">進入 PDF XSS 演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🎨 版面主題色自訂 (CSS Injection)</h5>
+                            <p class="card-text">允許使用者填入自訂 CSS 以調整個人版面樣式。可用於測試 CSS 注入漏洞與繞過。</p>
+                            <a href="/css_injection.php" class="btn btn-primary">進入主題自訂</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🎯 點擊劫持 (Clickjacking / iframe 漏洞)</h5>
+                            <p class="card-text">外部網站利用透明 iframe 覆蓋本站敏感按鈕，誘騙已登入的使用者進行非預期點擊操作。</p>
+                            <a href="/clickjacking_poc.php" class="btn btn-primary">進入點擊劫持演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🎯 客戶端安全控制缺失 (CWE-602)</h5>
+                            <p class="card-text">個人控制台敏感功能，僅使用 CSS display:none 進行前端隱藏，學員可演練如何利用 F12 修改樣式並繞過伺服器端驗證。</p>
+                            <a href="/hidden_control.php" class="btn btn-primary">進入前端隱藏越權演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📋 不安全 HTML 表單配置</h5>
+                            <p class="card-text">敏感資料以 GET 傳送、自動完成啟用，且後端未校驗 Email、選單與型態等欄位風險。</p>
+                            <a href="/form_risks.php" class="btn btn-primary">進入表單風險演練</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第三類：身分驗證與商業邏輯缺陷 -->
+            <h5 class="text-orange mb-3 border-bottom pb-2">🔑 第三類：身分驗證與商業邏輯缺陷 (Auth & Business Logic Failures)</h5>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">👤 個人資料 (IDOR / 越權)</h5>
+                            <p class="card-text">修改或查詢個人資訊，可用於測試 IDOR 水平越權與 Mass Assignment 漏洞。</p>
+                            <a href="/profile.php" class="btn btn-primary">進入個人資料</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">⚡ AJAX 查詢 (BOLA / IDOR / XSS)</h5>
+                            <p class="card-text">異步 AJAX 獲取個資系統，可用於測試 API 權限缺陷、個資過度暴露與 DOM-based XSS 漏洞。</p>
+                            <a href="/ajax_vulnerability.php" class="btn btn-primary">進入 AJAX 測試</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🔑 密碼重設 (邏輯缺陷)</h5>
+                            <p class="card-text">測試密碼重設流程的安全性缺陷，了解如何免驗證重設他人密碼。</p>
+                            <a href="/reset_password.php" class="btn btn-primary">前往密碼重設</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📅 活動報名 (安全設計缺陷)</h5>
+                            <p class="card-text">可在此測試商業邏輯漏洞，例如數量輸入負數、前端價格竄改等缺陷。</p>
+                            <a href="/events.php" class="btn btn-primary">進入活動列表</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🔗 網址轉向 (Open Redirect)</h5>
+                            <p class="card-text">系統內部跳轉功能未做過濾，可用於進行釣魚攻擊與 Open Redirect 測試。</p>
+                            <a href="/redirect.php?url=courses.php" class="btn btn-primary">測試網址轉向</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📍 行動定位打卡 (HTML5 / localStorage)</h5>
+                            <p class="card-text">使用 HTML5 Geolocation 打卡，並將資訊存於 localStorage。可用於測試定位隱私洩漏 (IDOR) 與 DOM XSS。</p>
+                            <a href="/checkin.php" class="btn btn-primary">前往打卡頁面</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🔑 Switch 語句缺失與越權漏洞 (CWE-484)</h5>
+                            <p class="card-text">模擬權限驗證工具，在 switch 語句中缺少 break 導致 Fall-through，學員可演練如何利用此程式設計缺陷實現垂直越權。</p>
+                            <a href="/switch_defect.php" class="btn btn-primary">進入 Switch 越權演練</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第四類：檔案處置與伺服器資源安全 -->
+            <h5 class="text-orange mb-3 border-bottom pb-2">📂 第四類：檔案處置與伺服器資源安全 (Files, Upload & Server Resources)</h5>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📤 大頭貼上傳 (任意檔案上傳)</h5>
+                            <p class="card-text">提供使用者上傳大頭貼的功能，允許上傳 .php 網頁後門執行 Command。</p>
+                            <a href="/upload.php" class="btn btn-primary">前往上傳大頭貼</a>
                         </div>
                     </div>
                 </div>
@@ -374,9 +410,68 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
-                            <h5 class="card-title">📄 PDF 嵌入跨站腳本 (PDF-based XSS)</h5>
-                            <p class="card-text">上傳成果 PDF 檔案，若前端未進行沙盒防範直接使用 iframe 嵌入，PDF 內置 JS 會在同源下執行並竊取 Session 與 LocalStorage。</p>
-                            <a href="/pdf_xss_demo.php" class="btn btn-primary">進入 PDF XSS 演練</a>
+                            <h5 class="card-title">📥 檔案下載 (Path Traversal)</h5>
+                            <p class="card-text">透過檔案路徑下載公開或私密檔案，可用於測試路徑遍歷與任意下載漏洞。</p>
+                            <a href="/download.php" class="btn btn-primary">前往檔案下載</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🖼️ 圖片檢視器 (路徑穿越漏洞)</h5>
+                            <p class="card-text">利用圖片顯示端點，在沒有安全路徑過濾下，嘗試讀取資料庫帳密或系統設定檔。</p>
+                            <a href="/image_viewer.php" class="btn btn-primary">進入圖片檢視器</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🔍 自訂個資洩漏與 ZAP 腳本檢測</h5>
+                            <p class="card-text">明文暴露身分證、電話等敏感個資，並提供 ZAP 被動腳本代碼讓學員實作自訂 Regex 規則報警。</p>
+                            <a href="/pii_leakage.php" class="btn btn-primary">進入個資檢測演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📦 第三方套件與經典元件漏洞</h5>
+                            <p class="card-text">展示 PHP 反序列化漏洞 (Object Injection)、PHPMailer RCE，與 Log4Shell 漏洞之模擬與防禦對照。</p>
+                            <a href="/component_vulnerabilities.php" class="btn btn-primary">進入不安全元件演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">💥 底層緩衝區溢位 (Buffer Overflow)</h5>
+                            <p class="card-text">呼叫底層 C 語言編寫的二進位程式，利用 strcpy 漏洞覆寫記憶體堆疊，觸發服務崩潰與 SIGSEGV 錯誤。</p>
+                            <a href="/buffer_overflow.php" class="btn btn-primary">進入緩衝區溢位演練</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第五類：加密機制失效與不安全隨機數 (A02:2021-Cryptographic Failures) -->
+            <h5 class="text-orange mb-3 border-bottom pb-2">🔑 第五類：加密機制失效與不安全隨機數 (Cryptographic Failures & Unsafe Randomness)</h5>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🎲 CVE-2025-7783: 弱隨機 Boundary 生成 (CWE-330)</h5>
+                            <p class="card-text">模擬弱隨機 Boundary 分隔符生成，學員可演練如何利用 LCG 偽隨機公式逆向推導種子，精準預測未來的隨機邊界。</p>
+                            <a href="/cve_2025_7783.php" class="btn btn-primary">進入弱隨機數演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">🔑 Cookie 明文敏感資訊儲存 (CWE-315)</h5>
+                            <p class="card-text">模擬快速登入功能，將密碼與身分直接以明文存在前端 Cookie 中，學員可演練如何利用 Cookie 竄改實現任意身分登入越權。</p>
+                            <a href="/cookie_sensitive.php" class="btn btn-primary">進入 Cookie 越權演練</a>
                         </div>
                     </div>
                 </div>

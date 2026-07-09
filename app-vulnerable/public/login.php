@@ -92,6 +92,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="/index.php">回首頁</a> | 
             <a href="/reset_password.php">忘記密碼？</a>
         </div>
+
+        <!-- CWE-615 原始碼註解漏洞示範： -->
+        <!-- 臨時新增的測試教師帳號供外包商檢測：teacher01 / password123 (正式上線前請務必刪除) -->
     </main>
 </div>
 

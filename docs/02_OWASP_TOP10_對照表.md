@@ -55,6 +55,14 @@
 | 42 | **日誌敏感資訊外洩 (CWE-532)** | `/login.php` (登入端點) | 右上角「前往登入」進入登入頁面 | A09:2025-安全記錄和監控失效 | 登入失敗與登入成功日誌將使用者輸入的明文密碼直接寫入稽核日誌資料庫中，造成密碼洩漏。 |
 | 43 | **Switch 缺少 break 越權 (CWE-484)** | `/admin/logs.php` | 右下角管理員後台「稽核日誌」功能 | A01:2025-權限控制缺失 | 權限判斷 Switch 中漏寫 break 導致 Fall-through 授予低權限角色 (student/teacher) 越權存取管理員日誌。 |
 | 44 | **缺少自訂錯誤頁面 (CWE-756)** | 全站頁面 (無效 URL) | 存取全站不存在的頁面 (例如 `/notexist`) | A02:2025-安全設定缺陷 | 弱點版使用 Apache 預設錯誤頁面，洩漏 Apache/PHP 詳細版本。修正版配置自訂安全錯誤頁。 |
+| 45 | **系統命令注入 (Command Injection) 專屬演練** | `/command_injection.php` | 「💻 系統命令注入...」卡片 | A05:2025-注入式攻擊 | 輸入 `127.0.0.1 & whoami` (Windows) 或 `127.0.0.1 ; whoami` (Linux) 執行任意系統指令。修正版驗證輸入格式並以 escapeshellarg 轉義。 |
+| 46 | **Cookie 明文敏感資訊儲存 (CWE-315)** | `/cookie_sensitive.php` | 「🔑 明文 Cookie 敏感資訊儲存 (CWE-315) 演練」卡片 | A04:2025-加密機制失效 | 模擬 Remember Me 將明文帳密與角色存於 Cookie。攻擊者可藉此密碼洩漏或竄改角色為 admin 越權登入。修正版改為安全 Token 與後端 Session。 |
+| 47 | **HTTP 響應分裂 / CRLF 注入 (CWE-93)** | `/crlf_injection.php` | 「🌐 HTTP 響應分裂 / CRLF 注入 (CWE-93) 演練」卡片 | A05:2025-注入式攻擊 | 跳轉網址拼接解碼輸入且未過濾 `%0d%0a`，允許注入如 `Set-Cookie` 等自訂 HTTP 標頭。修正版清除輸入中的 \r\n 換行字元。 |
+| 48 | **弱隨機 Boundary 生成漏洞 (CVE-2025-7783)** | `/cve_2025_7783.php` | 「🔒 CVE-2025-7783: 弱隨機 Boundary 生成漏洞演練 (CWE-330)」卡片 | A04:2025-加密機制失效 | 模擬 LCG PRNG 生產 multipart 邊界分隔符，使 Boundary 可被預測，可用於參數污染與請求走私。修正版採用 CSPRNG random_bytes。 |
+| 49 | **Eval 程式碼注入漏洞 (CWE-95)** | `/eval_injection.php` | 「⚙️ Eval 程式碼注入漏洞 (CWE-95) 演練」卡片 | A05:2025-注入式攻擊 | 數學公式計算器直接拼接使用者輸入至 `eval()`，導致任意 PHP 代碼執行 (RCE)。修正版採用嚴格的數學字元白名單正則過濾。 |
+| 50 | **客戶端安全控制缺失 (CWE-602)** | `/hidden_control.php` | 「🎯 客戶端安全控制缺失 (CWE-602) 演練」卡片 | A01:2025-權限控制缺失 | 僅在前端 CSS 隱藏提權按鈕，後端收到 POST 提權請求時完全未做權限與身分校驗。修正版加設伺服器端 $current_role !== admin 檢查。 |
+| 51 | **Switch Case 缺失 (CWE-484)** | `/switch_defect.php` | 「🔑 Switch 語句缺失與越權漏洞 (CWE-484) 演練」卡片 | A01:2025-權限控制缺失 | switch 語句中 `case 'student'` 後漏寫 `break;`，導致 Fall-through 直接執行 admin 授權區塊越權。修正版使用 match 語法防範。 |
+| 52 | **XPath 注入漏洞 (CWE-643)** | `/xpath_injection.php` | 「🌐 XPath 注入漏洞 (CWE-643) 演練」卡片 | A05:2025-注入式攻擊 | XML 查詢中直接拼接輸入，輸入 `' or 1=1 or '` 閉合邊界並拖出 XML 內的所有隱私機密資料。修正版過濾單雙引號防範。 |
 
 ---
 
@@ -65,6 +73,8 @@
 - [CWE-639 (Authorization Bypass Through User-Controlled Key)](https://cwe.mitre.org/data/definitions/639.html) - 物件層級越權 (IDOR)
 - [CWE-22 (Improper Limitation of a Pathname to a Restricted Directory)](https://cwe.mitre.org/data/definitions/22.html) - 路徑穿越 (Path Traversal)
 - [CWE-434 (Unrestricted Upload of File with Dangerous Type)](https://cwe.mitre.org/data/definitions/434.html) - 任意檔案上傳 Webshell
+- [CWE-602 (Client-Side Enforcement of Server-Side Security)](https://cwe.mitre.org/data/definitions/602.html) - 客戶端安全控制缺失
+- [CWE-484 (Omitted Break in Switch Statement)](https://cwe.mitre.org/data/definitions/484.html) - Switch 語句缺失 break
 
 ### 1. 漏洞頁面與成因
 - **頁面**：`/profile.php?id=X`、`/admin/export_registrations.php`、`/api/profile.php`、`/upload.php`（導引大廳）、`/upload_bypass_html.php`、`/upload_bypass_js.php`、`/upload_bypass_backend.php`
@@ -75,6 +85,8 @@
     - **第一關 (HTML 驗證缺陷 - `/upload_bypass_html.php`)**：僅使用 HTML 的 `accept` 屬性進行檔案類型提示篩選，可在檔案選擇框中手動切換為「所有檔案 (*.*)」或 F12 移除屬性直接繞過。
     - **第二關 (前端 JS 驗證缺陷 - `/upload_bypass_js.php`)**：僅在瀏覽器端使用 JavaScript 在 `onsubmit` 時檢查副檔名。能被攔截工具在中途輕易竄改檔名繞過。
     - **第三關 (後端弱驗證缺陷 - `/upload_bypass_backend.php`)**：只校驗用戶端傳送的 `Content-Type` 標頭 (如 `image/png`)，一旦被攻擊者在傳輸中竄改標頭，後端即會放行 `.php` Webshell 檔案上傳。
+  - **客戶端安全控制缺失 (`/hidden_control.php`)**：後端僅依賴前端 HTML/CSS 隱藏敏感提權按鈕，但在伺服器端收到 POST 提權請求時，完全沒有進行任何身分驗證即執行操作。
+  - **Switch Case 缺失 (`/switch_defect.php`)**：後端在使用 switch 進行權限分配時漏寫 `break;`，導致代碼匹配 student 時直通 (Fall-through) 下方 admin 分支而獲得管理員的操作權限。
 
 ### 2. ZAP 偵測與手動驗證
 - **ZAP 檢測**：ZAP 的 **Active Scan** 可以針對這三個上傳分頁進行主動掃描，測試不同副檔名與 Content-Type 的惡意程式碼。
@@ -125,6 +137,12 @@
       move_uploaded_file($file_tmp, $upload_dir . $new_file_name);
   }
   ```
+  * **客戶端安全控制缺失 (`/hidden_control.php`)**：
+    * 弱點代碼：直接信任 POST 請求並將角色改為 admin。
+    * 修正代碼：後端加入 `if ($current_role !== 'admin')` 校驗，拒絕非管理員的越權操作。
+  * **Switch Case 缺失 (`/switch_defect.php`)**：
+    * 弱點代碼：switch 語句 case 'student' 後漏寫 break，直接滑落至 admin 分支。
+    * 修正代碼：改用 PHP 8.0 的 `match` 表達式重構，徹底防範直通漏洞。
 
 ---
 
@@ -186,23 +204,30 @@
 ## A04:2025 - 加密機制失效 (Cryptographic Failures)
 
 ### 1. 漏洞頁面與成因
-- **頁面**：`/login.php`、`/reset_password.php`、`/admin/export_registrations.php`
+- **頁面**：`/login.php`、`/reset_password.php`、`/admin/export_registrations.php`、`/cookie_sensitive.php`、`/cve_2025_7783.php`
 - **成因**：
   - 資料庫密碼直接以明文儲存，存在嚴重資安風險。
   - 重設密碼 Token 使用可預測的 `md5(username)` 規則。
   - 個資（如假身分證字號）在 API 與資料匯出時以明文顯示，無任何加密或遮罩。
+  - **Cookie 明文敏感資訊儲存 (`/cookie_sensitive.php`)**：將敏感的帳號、密碼或權限角色以明文方式儲存於瀏覽器 Cookie 中，且後端直接信任來自 Cookie 的資料進行會話重塑，易被竄改越權。
+  - **弱隨機 Boundary 生成漏洞 (`/cve_2025_7783.php` - CVE-2025-7783)**：使用密碼學不安全的 PRNG (線性同餘 LCG) 演算法生成 multipart 邊界字串，使安全邊界可被預測推算，引發請求走私與參數污染風險。
 
 ### 2. ZAP 偵測與手動驗證
-- **ZAP 檢測**：ZAP 能在主動/被動掃描中，分析傳輸的敏感個資（如身分證字號特徵）並發出警告。
+- **ZAP 檢測**：ZAP 能在主動/被動掃描中，分析傳輸的敏感個資（如身分證字號特徵）或不安全的明文憑證傳輸，並發出警告。
 - **手動驗證**：
   - 在弱點版中重設密碼，觀察產生的 Token 連結，發現 student01 的 token 永遠是 `5f4dcc3b5aa765d61d8327deb882cf99` (即 MD5 of student01)。
   - 查看 API 輸出結果，發現包含未遮蔽的身分證字號與手機。
+  - **明文 Cookie 竄改驗證**：以 student01 登入 `/cookie_sensitive.php`，F12 Cookie 管理器中會看到明文帳密與角色。將 `remember_user` 與 `remember_role` 改為 `admin`，重新整理，發現成功越權登入為 admin。
+  - **弱隨機 Boundary 預測驗證**：在 `/cve_2025_7783.php` 生成兩次隨機數，使用右側計算器輸入最後一次觀測的數值，預測出下一個 Boundary。點擊再次生成，比對兩者是否完全一致。
 
 ### 3. 程式修補對照
 - **弱點版**：
   ```php
-  
   $predictable_token = md5($username);
+  // 明文 Cookie 敏感資訊
+  setcookie('remember_pwd', $password, ...);
+  // 弱隨機 LCG 演算法
+  $next_seed = ($a * $current_seed + $c) % $m;
   ```
 - **修正版**：
   ```php
@@ -211,6 +236,10 @@
   password_verify($password, $user['password_hash']);
   // 強隨機 Token
   $secure_token = bin2hex(random_bytes(32));
+  // 安全記住我 (不儲存明文敏感資訊，並開啟 HttpOnly)
+  setcookie('remember_token', $token, ['httponly' => true, 'samesite' => 'Lax']);
+  // 安全 Boundary (採用 CSPRNG random_bytes)
+  $random_hex = bin2hex(random_bytes(16));
   ```
 
 ---
@@ -222,8 +251,11 @@
   - SQLi：`/courses.php?q=X`、`/course_detail.php?id=X`
   - XSS：反射型（`/courses.php?q=X`）、儲存型（`/messages.php`）
   - Path Traversal：`/download.php?file=X`
-  - Command Injection：`/admin/ping.php`
-- **成因**：將使用者輸入直接串接到 SQL 語句、網頁輸出、系統命令或檔案讀取路徑中。
+  - Command Injection：`/admin/ping.php`、`/command_injection.php` (專屬頁面)
+  - CRLF Injection：`/crlf_injection.php`
+  - Eval Injection：`/eval_injection.php`
+  - XPath Injection：`/xpath_injection.php`
+- **成因**：將使用者輸入直接串接到 SQL 語句、網頁輸出、系統命令、檔案讀取路徑、HTTP 響應標頭、PHP eval() 或是 XML 查詢語法中，未對控制字元進行適當過濾與轉義，破壞了原本的資料與程式碼邊界。
 
 ### 2. ZAP 偵測與手動驗證
 - **ZAP 檢測**：ZAP 的 **Active Scan** (主動掃描) 極易偵測出 SQL Injection、反射型 XSS、路徑遍歷與命令注入，會發出 **High Risk** 警報並附帶攻擊 Payload 證據。
@@ -245,7 +277,16 @@
   - 修正：使用 `basename($file)` 限制只能讀取檔名，或使用 ID 查表。
 - **Command Injection 修補**：
   - 弱：`shell_exec("ping " . $ip)`
-  - 修正：使用 `filter_var($ip, FILTER_VALIDATE_IP)` 限定只能輸入 IP。
+  - 修正：使用 `filter_var($ip, FILTER_VALIDATE_IP)` 或主機名格式檢查進行白名單防禦，並以 `escapeshellarg()` 進行命令參數安全跳脫。
+- **CRLF 注入修補**：
+  - 弱：`$headers_packet .= "Location: " . urldecode($url_input) . "\r\n";`
+  - 修正：`$safe_url = str_replace(["\r", "\n", "%0d", "%0a", "%0D", "%0A"], "", $decoded_url);`
+- **Eval 注入修補**：
+  - 弱：`eval("return " . $expr . ";");`
+  - 修正：利用嚴格的數學字元白名單正則檢查 `preg_match('/^[0-9+\-*\/().\s]+$/', $expr)`，完全封鎖任何 PHP 函數字元。
+- **XPath 注入修補**：
+  - 弱：`$query = "/users/user[username/text()='" . $username . "']";`
+  - 修正：將輸入過濾單雙引號 `$safe_username = str_replace(["'", '"'], "", $username);`，阻止 XPath 查詢語意被破壞。
 
 ---
 

@@ -24,8 +24,9 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ./app-vulnerable/public:/var/www/html/public
-      - ./app-vulnerable/src:/var/www/html/src
+      - ./app-vulnerable/public:/var/www/html/public:ro
+      - ./app-vulnerable/src:/var/www/html/src:ro
+      - vuln-vulnerable-uploads:/var/www/html/public/uploads
     depends_on:
       - db
     networks:
@@ -40,8 +41,9 @@ services:
     ports:
       - "8081:80"
     volumes:
-      - ./app-fixed/public:/var/www/html/public
-      - ./app-fixed/src:/var/www/html/src
+      - ./app-fixed/public:/var/www/html/public:ro
+      - ./app-fixed/src:/var/www/html/src:ro
+      - vuln-fixed-uploads:/var/www/html/public/uploads
     depends_on:
       - db
     networks:
@@ -69,3 +71,5 @@ networks:
 
 volumes:
   db-data:
+  vuln-vulnerable-uploads:
+  vuln-fixed-uploads:

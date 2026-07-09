@@ -142,6 +142,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <a href="/index.php" class="text-decoration-none">回首頁</a> | 
             <a href="/reset_password.php" class="text-decoration-none text-muted">忘記密碼？</a>
         </div>
+
+        <?php
+        // 安全修補對照 (CWE-615)：敏感資料備忘應只存在於後端伺服器註解中，絕不能出現在前端 HTML 註解中。
+        // 備忘：測試教師帳號：teacher01 / password123 (已從前端 HTML 移除)
+        ?>
     </main>
 </div>
 

@@ -135,7 +135,10 @@ require_once __DIR__ . '/../src/helpers.php';
         <!-- 系統功能選單 -->
         <div class="col-md-8">
             <h3 class="mb-4 text-dark font-weight-bold">功能列表 (已修補防禦)</h3>
-            <div class="row">
+
+            <!-- 第一類：輸入驗證與過濾防禦 -->
+            <h5 class="text-success mb-3 border-bottom pb-2">🛡️ 第一類：伺服器端注入與解析漏洞防禦 (Server-Side Injection & Parsing)</h5>
+            <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
@@ -148,12 +151,81 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">📦 第三方套件與經典元件漏洞</h5>
-                            <p class="card-text text-muted flex-grow-1">使用反序列化白名單、日誌禁用解析與信箱命令跳脫，安全抵禦已知漏洞。</p>
-                            <a href="/component_vulnerabilities.php" class="btn btn-outline-primary mt-2">進入不安全元件演練</a>
+                            <h5 class="card-title text-primary">📖 課程查詢系統</h5>
+                            <p class="card-text text-muted flex-grow-1">使用 PDO Prepared Statements 參數化查詢，徹底根除 SQL 注入漏洞。</p>
+                            <a href="/courses.php" class="btn btn-outline-primary mt-2">進入課程查詢</a>
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">📂 檔案引入防禦 (LFI / RFI 白名單)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用硬編碼檔案白名單，徹底阻絕使用者控制 include 檔案路徑與網址的可能。</p>
+                            <a href="/file_inclusion.php" class="btn btn-outline-primary mt-2">進入檔案引入演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🌐 SSRF 預覽 (安全過濾)</h5>
+                            <p class="card-text text-muted flex-grow-1">遠端圖片預覽，後端過濾私有 IP 段與非 HTTP/HTTPS 協定，避免內部伺服器被探測攻擊。</p>
+                            <a href="/ssrf_demo.php" class="btn btn-outline-primary mt-2">進入 SSRF 測試</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">📁 XXE 匯入 (關閉外部實體)</h5>
+                            <p class="card-text text-muted flex-grow-1">上傳名單 XML 解析，後端強制關閉外部實體解析與 DTD 加載，杜絕惡意檔案讀取與 XXE 危害。</p>
+                            <a href="/xxe_demo.php" class="btn btn-outline-primary mt-2">進入 XXE 測試</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">💻 系統命令注入安全修補 (Command Injection)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用 filter_var 與 escapeshellarg 強制限制輸入格式，阻絕一切 command 拼接與特殊字元逃逸風險。</p>
+                            <a href="/command_injection.php" class="btn btn-outline-primary mt-2">進入命令注入修補</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🌐 XPath 注入安全修補 (CWE-643)</h5>
+                            <p class="card-text text-muted flex-grow-1">後端使用字元過濾剔除單引號與雙引號，阻止攻擊者閉合查詢邊界，完全防止 XPath 注入威脅。</p>
+                            <a href="/xpath_injection.php" class="btn btn-outline-primary mt-2">進入 XPath 注入修補</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🌐 CRLF 注入安全修補 (CWE-93)</h5>
+                            <p class="card-text text-muted flex-grow-1">於寫入 HTTP 標頭前過濾清除 %0d%0a / \r\n 換行符，阻斷 HTTP 響應分裂與任意標頭強植。</p>
+                            <a href="/crlf_injection.php" class="btn btn-outline-primary mt-2">進入 CRLF 注入修補</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">⚙️ Eval 程式碼注入安全修補 (CWE-95)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用正則白名單限制輸入僅能包含數字與算術運算符，禁止任何 PHP 敏感字眼與函數以防範 RCE。</p>
+                            <a href="/eval_injection.php" class="btn btn-outline-primary mt-2">進入 Eval 注入修補</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 第二類：跨站腳本與前端安全防禦 -->
+            <h5 class="text-success mb-3 border-bottom pb-2">💬 第二類：跨站腳本與前端安全防禦 (XSS & Client-Side)</h5>
+            <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
@@ -181,34 +253,38 @@ require_once __DIR__ . '/../src/helpers.php';
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">📄 PDF 嵌入安全防護 (PDF-based XSS 防禦)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用 <code>sandbox</code> 屬性將 iframe 沙盒化，禁用 PDF 中的惡意 JS 執行，或強制配置下載回應標頭防止瀏覽器同源解析。</p>
+                            <a href="/pdf_xss_demo.php" class="btn btn-outline-primary mt-2">進入 PDF XSS 演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🎨 版面主題色自訂 (CSS 注入防護)</h5>
+                            <p class="card-text text-muted flex-grow-1">限制自訂 CSS 樣式只能輸入白名單格式，或完全轉義，防止任何 CSS Injection 危害。</p>
+                            <a href="/css_injection.php" class="btn btn-outline-primary mt-2">進入主題自訂</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🎯 點擊劫持 (Clickjacking 防禦)</h5>
+                            <p class="card-text text-muted flex-grow-1">安全版配置嚴格的 <code>X-Frame-Options: DENY</code> 回應標頭，阻斷網頁被外部 iframe 嵌入，杜絕劫持。</p>
+                            <a href="/clickjacking_poc.php" class="btn btn-outline-primary mt-2">進入點擊劫持演練</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">📋 HTML 表單安全配置與防禦</h5>
-                            <p class="card-text text-muted flex-grow-1">使用 POST 提交、停用 Autocomplete，並實作 Email、選單與整數型態之後端嚴格校驗。</p>
-                            <a href="/form_risks.php" class="btn btn-outline-primary mt-2">進入表單風險演練</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">📖 課程查詢系統</h5>
-                            <p class="card-text text-muted flex-grow-1">使用 PDO Prepared Statements 參數化查詢，徹底根除 SQL 注入漏洞。</p>
-                            <a href="/courses.php" class="btn btn-outline-primary mt-2">進入課程查詢</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">📅 活動報名 (後端計算與行鎖)</h5>
-                            <p class="card-text text-muted flex-grow-1">後端重算金額、校驗數量為正整數、並使用 SELECT FOR UPDATE 阻擋超賣。</p>
-                            <a href="/events.php" class="btn btn-outline-primary mt-2">進入活動列表</a>
-                        </div>
-                    </div>
-                </div>
+            <!-- 第三類：身分驗證與商業邏輯缺陷防禦 -->
+            <h5 class="text-success mb-3 border-bottom pb-2">🔑 第三類：身分驗證與商業邏輯缺陷防禦 (Auth & Business Logic Failures)</h5>
+            <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
@@ -221,36 +297,9 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">📤 大頭貼上傳 (檔案安全性過濾)</h5>
-                            <p class="card-text text-muted flex-grow-1">限制副檔名 (僅限圖片)，重新生成亂數檔名，並禁止執行上傳目錄內的腳本。</p>
-                            <a href="/upload.php" class="btn btn-outline-primary mt-2">前往上傳大頭貼</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">📂 檔案引入防禦 (LFI / RFI 白名單)</h5>
-                            <p class="card-text text-muted flex-grow-1">使用硬編碼檔案白名單，徹底阻絕使用者控制 include 檔案路徑與網址的可能。</p>
-                            <a href="/file_inclusion.php" class="btn btn-outline-primary mt-2">進入檔案引入演練</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">📥 檔案下載 (File ID 查表)</h5>
-                            <p class="card-text text-muted flex-grow-1">使用資料庫 File ID 查表下載，完全移除使用者對硬碟路徑的直接控制權。</p>
-                            <a href="/download.php" class="btn btn-outline-primary mt-2">前往檔案下載</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">🖼️ 圖片檢視器 (路徑過濾防護)</h5>
-                            <p class="card-text text-muted flex-grow-1">使用 <code>basename()</code> 剝離目錄穿越字元，防範未授權讀取 uploads 資料夾以外的敏感檔案。</p>
-                            <a href="/image_viewer.php" class="btn btn-outline-primary mt-2">進入圖片檢視器</a>
+                            <h5 class="card-title text-primary">⚡ AJAX 查詢 (安全防護)</h5>
+                            <p class="card-text text-muted flex-grow-1">異步 AJAX 查詢，後端強制執行垂直/水平權限校驗，個資遮蔽，且前端以文字渲染防止 DOM XSS。</p>
+                            <a href="/ajax_vulnerability.php" class="btn btn-outline-primary mt-2">進入 AJAX 測試</a>
                         </div>
                     </div>
                 </div>
@@ -260,6 +309,15 @@ require_once __DIR__ . '/../src/helpers.php';
                             <h5 class="card-title text-primary">🔑 密碼重設 (強隨機 Token 流程)</h5>
                             <p class="card-text text-muted flex-grow-1">重設連結包含高強度一次性 Token，且後端嚴格校驗 Token 的有效性與時效。</p>
                             <a href="/reset_password.php" class="btn btn-outline-primary mt-2">前往密碼重設</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">📅 活動報名 (後端計算與行鎖)</h5>
+                            <p class="card-text text-muted flex-grow-1">後端重算金額、校驗數量為正整數、並使用 SELECT FOR UPDATE 阻擋超賣。</p>
+                            <a href="/events.php" class="btn btn-outline-primary mt-2">進入活動列表</a>
                         </div>
                     </div>
                 </div>
@@ -284,63 +342,23 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">🎯 點擊劫持 (Clickjacking 防禦)</h5>
-                            <p class="card-text text-muted flex-grow-1">安全版配置嚴格的 <code>X-Frame-Options: DENY</code> 回應標頭，阻斷網頁被外部 iframe 嵌入，杜絕劫持。</p>
-                            <a href="/clickjacking_poc.php" class="btn btn-outline-primary mt-2">進入點擊劫持演練</a>
+                            <h5 class="card-title text-primary">🔑 Switch 語句缺失與越權漏洞修補 (CWE-484)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用 PHP 8+ 的 match 表達式重構權限檢查流程，從語言特性上阻斷 Fall-through，徹底根除越權風險。</p>
+                            <a href="/switch_defect.php" class="btn btn-outline-primary mt-2">進入 Switch 越權修補</a>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- 第四類：檔案處置與伺服器資源安全防禦 -->
+            <h5 class="text-success mb-3 border-bottom pb-2">📂 第四類：檔案處置與伺服器資源安全防禦 (Files, Upload & Server Resources)</h5>
+            <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">🔍 自訂個資遮罩防禦驗證</h5>
-                            <p class="card-text text-muted flex-grow-1">對所有敏感個資實施遮罩與去識別化，使 ZAP 被動腳本無法匹配，驗證防禦有效性。</p>
-                            <a href="/pii_leakage.php" class="btn btn-outline-primary mt-2">進入個資檢測演練</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">🎨 版面主題色自訂 (CSS 注入防護)</h5>
-                            <p class="card-text text-muted flex-grow-1">限制自訂 CSS 樣式只能輸入白名單格式，或完全轉義，防止任何 CSS Injection 危害。</p>
-                            <a href="/css_injection.php" class="btn btn-outline-primary mt-2">進入主題自訂</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">⚡ AJAX 查詢 (安全防護)</h5>
-                            <p class="card-text text-muted flex-grow-1">異步 AJAX 查詢，後端強制執行垂直/水平權限校驗，個資遮蔽，且前端以文字渲染防止 DOM XSS。</p>
-                            <a href="/ajax_vulnerability.php" class="btn btn-outline-primary mt-2">進入 AJAX 測試</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">🌐 SSRF 預覽 (安全過濾)</h5>
-                            <p class="card-text text-muted flex-grow-1">遠端圖片預覽，後端過濾私有 IP 段與非 HTTP/HTTPS 協定，避免內部伺服器被探測攻擊。</p>
-                            <a href="/ssrf_demo.php" class="btn btn-outline-primary mt-2">進入 SSRF 測試</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-primary">📁 XXE 匯入 (關閉外部實體)</h5>
-                            <p class="card-text text-muted flex-grow-1">上傳名單 XML 解析，後端強制關閉外部實體解析與 DTD 加載，杜絕惡意檔案讀取與 XXE 危害。</p>
-                            <a href="/xxe_demo.php" class="btn btn-outline-primary mt-2">進入 XXE 測試</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="card h-100">
-                        <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-success">💥 緩衝區溢位 (雙重安全防護)</h5>
-                            <p class="card-text text-muted flex-grow-1">後端限制輸入字串長度，且底層 C 程式改用 strncpy 進行字串拷貝，徹底防範記憶體溢位漏洞。</p>
-                            <a href="/buffer_overflow.php" class="btn btn-outline-primary mt-2">進入緩衝區溢位演練</a>
+                            <h5 class="card-title text-primary">📤 大頭貼上傳 (檔案安全性過濾)</h5>
+                            <p class="card-text text-muted flex-grow-1">限制副檔名 (僅限圖片)，重新生成亂數檔名，並禁止執行上傳目錄內的腳本。</p>
+                            <a href="/upload.php" class="btn btn-outline-primary mt-2">前往上傳大頭貼</a>
                         </div>
                     </div>
                 </div>
@@ -356,9 +374,68 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
-                            <h5 class="card-title text-success">📄 PDF 嵌入安全防護 (PDF-based XSS 防禦)</h5>
-                            <p class="card-text text-muted flex-grow-1">使用 <code>sandbox</code> 屬性將 iframe 沙盒化，禁用 PDF 中的惡意 JS 執行，或強制配置下載回應標頭防止瀏覽器同源解析。</p>
-                            <a href="/pdf_xss_demo.php" class="btn btn-outline-primary mt-2">進入 PDF XSS 演練</a>
+                            <h5 class="card-title text-primary">📥 檔案下載 (File ID 查表)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用資料庫 File ID 查表下載，完全移除使用者對硬碟路徑的直接控制權。</p>
+                            <a href="/download.php" class="btn btn-outline-primary mt-2">前往檔案下載</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🖼️ 圖片檢視器 (路徑過濾防護)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用 <code>basename()</code> 剝離目錄穿越字元，防範未授權讀取 uploads 資料夾以外的敏感檔案。</p>
+                            <a href="/image_viewer.php" class="btn btn-outline-primary mt-2">進入圖片檢視器</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🔍 自訂個資遮罩防禦驗證</h5>
+                            <p class="card-text text-muted flex-grow-1">對所有敏感個資實施遮罩與去識別化，使 ZAP 被動腳本無法匹配，驗禦防範有效性。</p>
+                            <a href="/pii_leakage.php" class="btn btn-outline-primary mt-2">進入個資檢測演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">📦 第三方套件與經典元件漏洞</h5>
+                            <p class="card-text text-muted flex-grow-1">使用反序列化白名單、日誌禁用解析與信箱命令跳脫，安全抵禦已知漏洞。</p>
+                            <a href="/component_vulnerabilities.php" class="btn btn-outline-primary mt-2">進入不安全元件演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-success">💥 緩衝區溢位 (雙重安全防護)</h5>
+                            <p class="card-text text-muted flex-grow-1">後端限制輸入字串長度，且底層 C 程式改用 strncpy 進行字串拷貝，徹底防範記憶體溢位漏洞。</p>
+                            <a href="/buffer_overflow.php" class="btn btn-outline-primary mt-2">進入緩衝區溢位演練</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 第五類：加密機制失效與不安全隨機數防禦 (A02:2021-Cryptographic Failures) -->
+            <h5 class="text-success mb-3 border-bottom pb-2">🔑 第五類：加密機制失效與不安全隨機數防禦 (Cryptographic Failures & Unsafe Randomness)</h5>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🎲 CVE-2025-7783: 安全隨機 Boundary 生成 (CWE-330)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用 CSPRNG (random_bytes) 產生高熵邊界分隔符，使攻擊者完全無法透過偽隨機公式預測未來邊界。</p>
+                            <a href="/cve_2025_7783.php" class="btn btn-outline-primary mt-2">進入隨機數修補</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🔑 Cookie 明文敏感資訊儲存修補 (CWE-315)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用高隨機代標 Token 取代 Cookie 中的敏感明文個資與密碼，並配置 HttpOnly 與 SameSite 安全屬性防範竊取與 CSRF。</p>
+                            <a href="/cookie_sensitive.php" class="btn btn-outline-primary mt-2">進入 Cookie 越權修補</a>
                         </div>
                     </div>
                 </div>
@@ -439,4 +516,3 @@ require_once __DIR__ . '/../src/helpers.php';
 </script>
 </body>
 </html>
-
