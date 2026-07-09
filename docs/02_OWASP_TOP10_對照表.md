@@ -707,3 +707,73 @@
   ErrorDocument 500 /error_500.php
   ```
   並在 `error_404.php` 中呈現不含任何 Server 版本資訊的精美自訂錯誤畫面。
+
+---
+
+## 補充演練 - 圖片檢視器路徑穿越 (CWE-22)
+
+### 1. 漏洞頁面與成因
+- **頁面**：`/show_image.php`
+- **成因**：後端圖片檢視器直接將使用者傳入的 `file` 參數拼接在 uploads 目錄後，未做任何 `basename()` 或安全防禦。這導致攻擊者能藉由 `../` 目錄遍歷字元跳出 uploads 目錄，直接讀取伺服器內部機密檔案。
+
+### 2. 手動驗證與 ZAP 檢驗
+- **ZAP 檢測**：ZAP 的 **Active Scan**（主動掃描）在掃描到 `file` 參數時，會發送各種 `../` 的路徑遍歷 Payload。當發現回傳的 HTTP 內容與本地檔案（如 `/etc/passwd`）特徵吻合時，會發出 **High Risk - Path Traversal** 警告。
+- **手動驗證**：
+  1. 登入後造訪：`http://localhost:8080/show_image.php?file=../../src/db.php`，驗證是否能直接讀取到資料庫的明文連接帳密。
+  2. 修改參數為：`http://localhost:8080/show_image.php?file=../../../../../../../../etc/passwd`，驗證是否能成功讀取 Linux 的使用者帳號清單。
+
+### 3. 程式修補對照
+- **弱點版** (`app-vulnerable/public/show_image.php`)：
+  ```php
+  $filepath = __DIR__ . '/uploads/' . $_GET['file'];
+  readfile($filepath);
+  ```
+- **修正版** (`app-fixed/public/show_image.php`)：
+  ```php
+  // 安全修補 1：使用 basename() 強制僅提取純檔名，破壞目錄穿越路徑
+  $file = basename($_GET['file'] ?? '');
+  $filepath = __DIR__ . '/uploads/' . $file;
+  
+  // 安全修補 2：嚴格限制 MIME 必須是圖片，否則拒絕讀取
+  $mime = mime_content_type($filepath);
+  if (strpos($mime, 'image/') !== 0) {
+      die('存取拒絕');
+  }
+  ```
+
+---
+
+## 補充演練 - 繞過圖像特徵檢測 (CWE-434 / 圖片木馬)
+
+### 1. 漏洞頁面與成因
+- **頁面**：`/upload_bypass_polyglot.php` (大頭貼上傳第四關)
+- **成因**：後端只對上傳檔案進行 `getimagesize()` 來檢驗其是否為真實圖片，但在寫入檔案時**卻保留了使用者提供的原始副檔名**（例如 `.php`）。這使得攻擊者可以在一個合法 GIF 圖片二進位數據末尾拼接 PHP 木馬代碼（即圖片木馬/Polyglot），成功繞過內容特徵檢測，並將其當成 PHP 腳本在伺服器端執行取得 RCE。
+
+### 2. 手動驗證與 ZAP 檢驗
+- **手動驗證**：
+  1. 前往大頭貼上傳第四關，點擊「下載 GIF 圖片木馬 PoC」，會取得檔案 `polyglot-image-webshell.php`。
+  2. 在第四關直接上傳該檔案，由於其開頭為 GIF 圖片簽章 `GIF89a`，`getimagesize()` 判定其為合法圖片。
+  3. 上傳成功後，存取該連結並帶入系統命令：`http://localhost:8080/uploads/polyglot-image-webshell.php?cmd=whoami`，確認成功執行命令取得 RCE。
+
+### 3. 程式修補對照
+- **弱點版** (`app-vulnerable/public/upload_bypass_polyglot.php`)：
+  ```php
+  // 雖然檢查了圖片特徵，但依然使用原始上傳檔名
+  $img_info = getimagesize($file_tmp);
+  $destination = '/uploads/' . $_FILES['avatar']['name'];
+  move_uploaded_file($file_tmp, $destination);
+  ```
+- **修正版** (`app-fixed/public/upload_bypass_polyglot.php`)：
+  ```php
+  // 安全修補 1：副檔名白名單驗證
+  $file_ext = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+  if (!in_array($file_ext, ['jpg', 'jpeg', 'png', 'gif'])) {
+      die('副檔名錯誤');
+  }
+  
+  // 安全修補 2：對上傳檔案進行隨機安全性重新命名，不保留原始 .php 檔名
+  $new_name = bin2hex(random_bytes(16)) . '.' . $file_ext;
+  
+  // 安全修補 3：上傳目錄搭配 .htaccess 禁止執行 PHP
+  ```
+

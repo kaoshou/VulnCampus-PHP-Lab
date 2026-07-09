@@ -248,6 +248,15 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🖼️ 圖片檢視器 (路徑過濾防護)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用 <code>basename()</code> 剝離目錄穿越字元，防範未授權讀取 uploads 資料夾以外的敏感檔案。</p>
+                            <a href="/image_viewer.php" class="btn btn-outline-primary mt-2">進入圖片檢視器</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-primary">🔑 密碼重設 (強隨機 Token 流程)</h5>
                             <p class="card-text text-muted flex-grow-1">重設連結包含高強度一次性 Token，且後端嚴格校驗 Token 的有效性與時效。</p>
                             <a href="/reset_password.php" class="btn btn-outline-primary mt-2">前往密碼重設</a>

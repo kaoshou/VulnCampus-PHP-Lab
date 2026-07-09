@@ -266,6 +266,15 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
+                            <h5 class="card-title">🖼️ 圖片檢視器 (路徑穿越漏洞)</h5>
+                            <p class="card-text">利用圖片顯示端點，在沒有安全路徑過濾下，嘗試讀取資料庫帳密或系統設定檔。</p>
+                            <a href="/image_viewer.php" class="btn btn-primary">進入圖片檢視器</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
                             <h5 class="card-title">🔑 密碼重設 (邏輯缺陷)</h5>
                             <p class="card-text">測試密碼重設流程的安全性缺陷，了解如何免驗證重設他人密碼。</p>
                             <a href="/reset_password.php" class="btn btn-primary">前往密碼重設</a>

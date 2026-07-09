@@ -7,7 +7,16 @@ header("X-Powered-By: PHP/7.4.3");
 
 
 if (session_status() === PHP_SESSION_NONE) {
-    // 弱點版：Session Cookie 未設定 HttpOnly 與 SameSite，極易被 XSS 竊取 Session ID
+    // 弱點版：強制關閉 HttpOnly 與 SameSite 屬性，確保能演示 XSS 竊取 Cookie
+    ini_set('session.cookie_httponly', 0);
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path' => '/',
+        'domain' => '',
+        'secure' => false,
+        'httponly' => false, // 允許 JavaScript 讀取 Cookie 內容
+        'samesite' => ''     // 移除 SameSite 屬性以支援 CSRF 與跨站 Cookie 傳輸
+    ]);
     session_start();
 }
 
