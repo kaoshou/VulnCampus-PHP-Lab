@@ -1,7 +1,8 @@
-# 🟢 安全配置：防止在此目錄內執行任何 PHP 腳本
-# 即使有 Webshell 被成功上傳，Apache 也會拒絕執行，或是將其當作純文字下載
+# 安全防禦配置：強制關閉目錄瀏覽 (Disable Directory Browsing)
+Options -Indexes
 
-<FilesMatch "\.(php|php5|php7|php8|phtml)$">
+# 縱深防禦：禁止在上傳資料夾內解析與執行任何 PHP 腳本，防範 WebShell RCE 攻擊
+<FilesMatch "\.(php|php5|php8|phtml)$">
     Order Deny,Allow
     Deny from all
 </FilesMatch>

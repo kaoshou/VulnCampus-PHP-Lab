@@ -302,6 +302,15 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card">
                         <div class="card-body">
+                            <h5 class="card-title">🎯 點擊劫持 (Clickjacking / iframe 漏洞)</h5>
+                            <p class="card-text">外部網站利用透明 iframe 覆蓋本站敏感按鈕，誘騙已登入的使用者進行非預期點擊操作。</p>
+                            <a href="/clickjacking_poc.php" class="btn btn-primary">進入點擊劫持演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
                             <h5 class="card-title">🔍 自訂個資洩漏與 ZAP 腳本檢測</h5>
                             <p class="card-text">明文暴露身分證、電話等敏感個資，並提供 ZAP 被動腳本代碼讓學員實作自訂 Regex 規則報警。</p>
                             <a href="/pii_leakage.php" class="btn btn-primary">進入個資檢測演練</a>
@@ -391,7 +400,6 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="card-header font-weight-bold">🛠️ 系統診斷與管理</div>
                 <div class="card-body">
                     <a href="/debug.php" class="btn btn-outline-danger btn-block mb-2 text-wrap" style="white-space: normal; word-break: break-word;">🔍 系統偵錯頁 (debug.php)</a>
-                    <a href="/clickjacking_poc.php" class="btn btn-outline-warning btn-block mb-2 text-wrap" style="white-space: normal; word-break: break-word;">🖼️ 點擊劫持 PoC (clickjacking_poc.php)</a>
                     <a href="/admin/index.php" class="btn btn-outline-light btn-block text-wrap" style="white-space: normal; word-break: break-word;">🔒 管理員後台 (admin/)</a>
                 </div>
             </div>

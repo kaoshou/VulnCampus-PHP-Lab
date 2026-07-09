@@ -777,3 +777,38 @@
   // 安全修補 3：上傳目錄搭配 .htaccess 禁止執行 PHP
   ```
 
+---
+
+## 補充演練 - 個人資料修改頁面明文密碼外洩 (CWE-319 / CWE-522)
+
+### 1. 漏洞頁面與成因
+- **頁面**：`/profile.php`
+- **成因**：後端將使用者的敏感密碼以明文存放在資料庫中，且在個人資料修改表單呈現時，**直接將該明文密碼帶入 <code>&lt;input type="password"&gt;</code> 的 <code>value</code> 屬性中**。雖然網頁畫面上看似為隱碼（黑點），但任何人只需打開 F12 審查元素將 <code>type="password"</code> 變更為 <code>type="text"</code> 即可直接看穿使用者的明文登入密碼。
+
+### 2. 手動驗證與 ZAP 檢驗
+- **手動驗證**：
+  1. 使用任意帳號登入弱點版網站（如學生 `student01` / `password123`）。
+  2. 造訪個人資料頁：`http://localhost:8080/profile.php`。
+  3. 按 F12 打開開發者工具，找到密碼輸入框 `<input type="password" id="password" ...>`。
+  4. 雙擊修改其屬性，將 `type="password"` 改為 `type="text"`，會發現密碼欄位直接以明文顯現為 `password123`，證明存在嚴重敏感個資洩漏。
+
+### 3. 程式修補對照
+- **弱點版** (`app-vulnerable/public/profile.php`)：
+  ```html
+  <!-- 不安全：在 value 屬性中硬編碼直接帶出使用者的明文密碼 -->
+  <input type="password" name="password" value="<?= $profile['password'] ?>">
+  ```
+- **修正版** (`app-fixed/public/profile.php`)：
+  ```html
+  <!-- 安全：密碼欄位強制為空，不可帶出任何舊密碼，並提供 placeholder 指引 -->
+  <input type="password" name="password" placeholder="留空代表不修改密碼">
+  ```
+  後端於更新時，若密碼不為空，則使用 Bcrypt 進行安全雜湊後寫入資料庫：
+  ```php
+  if ($password !== '') {
+      $pw_hash = password_hash($password, PASSWORD_DEFAULT);
+      // 安全參數化查詢更新 password ...
+  }
+  ```
+
+

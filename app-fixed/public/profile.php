@@ -31,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = trim($_POST['phone'] ?? '');
     $student_no = trim($_POST['student_no'] ?? '');
     $national_id_fake = trim($_POST['national_id_fake'] ?? '');
+    $password = trim($_POST['password'] ?? '');
     
     // 修補重點 2：Mass Assignment 防禦。後端完全忽略前端 POST 傳入的 role 隱藏欄位，由後端邏輯決定角色
     // 此處不從 $_POST['role'] 讀取值寫入 SQL
@@ -49,6 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'national_id_fake' => $national_id_fake,
                 'id' => $id
             ]);
+
+            // 安全修補：如果密碼不為空，將其使用 password_hash 雜湊後安全寫入資料庫
+            if ($password !== '') {
+                $pw_hash = password_hash($password, PASSWORD_DEFAULT);
+                $pw_stmt = $pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
+                $pw_stmt->execute(['password' => $pw_hash, 'id' => $id]);
+            }
             
             $success = '個人資料更新成功！';
             
@@ -153,6 +161,13 @@ try {
                         <label for="national_id_fake" class="col-sm-3 col-form-label font-weight-bold">身分證字號：</label>
                         <div class="col-sm-9">
                             <input type="text" name="national_id_fake" id="national_id_fake" class="form-control" value="<?= h($profile['national_id_fake']) ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label for="password" class="col-sm-3 col-form-label font-weight-bold">變更登入密碼：</label>
+                        <div class="col-sm-9">
+                            <input type="password" name="password" id="password" class="form-control" placeholder="留空代表不修改密碼">
                         </div>
                     </div>
                     

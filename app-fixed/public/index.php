@@ -284,6 +284,15 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="col-md-6">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-primary">🎯 點擊劫持 (Clickjacking 防禦)</h5>
+                            <p class="card-text text-muted flex-grow-1">安全版配置嚴格的 <code>X-Frame-Options: DENY</code> 回應標頭，阻斷網頁被外部 iframe 嵌入，杜絕劫持。</p>
+                            <a href="/clickjacking_poc.php" class="btn btn-outline-primary mt-2">進入點擊劫持演練</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
                             <h5 class="card-title text-primary">🔍 自訂個資遮罩防禦驗證</h5>
                             <p class="card-text text-muted flex-grow-1">對所有敏感個資實施遮罩與去識別化，使 ZAP 被動腳本無法匹配，驗證防禦有效性。</p>
                             <a href="/pii_leakage.php" class="btn btn-outline-primary mt-2">進入個資檢測演練</a>
@@ -366,7 +375,6 @@ require_once __DIR__ . '/../src/helpers.php';
                 <div class="card-header font-weight-bold bg-dark text-white">⚙️ 管理功能</div>
                 <div class="card-body">
                     <a href="/admin/index.php" class="btn btn-dark w-100 mb-2 text-wrap" style="white-space: normal; word-break: break-word;">🔒 管理員後台 (限 Admin 存取)</a>
-                    <a href="/clickjacking_poc.php" class="btn btn-outline-warning w-100 mb-2 text-wrap" style="white-space: normal; word-break: break-word;">🖼️ 點擊劫持 PoC (clickjacking_poc.php)</a>
                     <p class="text-muted text-center text-small mb-0 mt-2">
                         * 提示：修正版無 debug.php 頁面以防配置外洩。
                     </p>

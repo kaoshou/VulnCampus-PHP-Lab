@@ -19,12 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $phone = $_POST['phone'] ?? '';
     $student_no = $_POST['student_no'] ?? '';
     $national_id_fake = $_POST['national_id_fake'] ?? '';
+    $password = $_POST['password'] ?? '';
     // 教學用弱點 2：表單參數竄改 / Mass Assignment。後端直接接收前端傳入的 role 欄位並更新到資料庫
     $role = $_POST['role'] ?? 'student'; 
 
     try {
         // 教學用弱點 3：SQL 注入。此處直接拼接更新
-        $sql = "UPDATE users SET name = '$name', email = '$email', phone = '$phone', student_no = '$student_no', national_id_fake = '$national_id_fake', role = '$role' WHERE id = $id";
+        $sql = "UPDATE users SET name = '$name', email = '$email', phone = '$phone', student_no = '$student_no', national_id_fake = '$national_id_fake', role = '$role', password_hash = '$password' WHERE id = $id";
         $pdo->exec($sql);
         
         $success = '資料修改成功！';
@@ -126,6 +127,14 @@ try {
                         <label for="national_id_fake" class="col-sm-3 col-form-label font-weight-bold">身分證字號：</label>
                         <div class="col-sm-9">
                             <input type="text" name="national_id_fake" id="national_id_fake" class="form-control" value="<?= $profile['national_id_fake'] ?>">
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="password" class="col-sm-3 col-form-label font-weight-bold">登入密碼：</label>
+                        <div class="col-sm-9">
+                            <input type="password" name="password" id="password" class="form-control" value="<?= $profile['password_hash'] ?>">
+                            <small class="form-text text-muted">提示：這是一個不安全的設計！使用 F12 審查元素將 <code>type="password"</code> 改成 <code>type="text"</code>，就能直接偷看明文密碼！</small>
                         </div>
                     </div>
                     

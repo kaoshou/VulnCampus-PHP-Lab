@@ -1,0 +1,3 @@
+# 弱點配置：故意開啟目錄瀏覽 (Directory Browsing)
+# ZAP 100% 會對此發出 Medium Risk 警報
+Options +Indexes
