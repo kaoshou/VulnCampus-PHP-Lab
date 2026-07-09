@@ -58,12 +58,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php if ($action_triggered): ?>
         <div class="text-center mt-3">
             <h5 class="text-success font-weight-bold">🟢 已安全清空活動報名</h5>
-            <p class="text-muted small">模擬清空成功（共清空了 **<?= $deleted_count ?>** 筆資料）。</p>
+            <p class="text-muted small">模擬清空成功（共清空了 <strong><?= $deleted_count ?></strong> 筆資料）。</p>
             <a href="/events.php" target="_parent" class="btn btn-sm btn-outline-success">📅 前往活動列表</a>
         </div>
     <?php else: ?>
         <h5 class="text-dark font-weight-bold">📅 活動報名管理設定 (安全防護)</h5>
-        <p class="text-muted small">點擊下方按鈕將立刻**取消並清空**您所有的活動報名歷史紀錄：</p>
+        <p class="text-muted small">點擊下方按鈕將立刻<strong>取消並清空</strong>您所有的活動報名歷史紀錄：</p>
         
         <form method="POST">
             <input type="hidden" name="csrf_token" value="<?= get_csrf_token() ?>">

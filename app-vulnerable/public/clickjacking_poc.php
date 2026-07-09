@@ -69,7 +69,7 @@ $guest = isset($_GET['guest']) ? $_GET['guest'] : '1';
         <div class="alert alert-danger text-center py-3 my-3 shadow-lg border border-danger">
             <h4 class="alert-heading font-weight-bold">💥 點擊劫持攻擊成功！ (Clickjacking Exploit Successful)</h4>
             <?php if ($guest === '0'): ?>
-                <p class="mb-0">後端防線已失守：您在點選「領取免費 iPhone」時，實際上點擊了隱藏的 iframe 按鈕，導致資料庫中 **<?= $deleted ?>** 筆活動報名紀錄被<strong>真實刪除</strong>！</p>
+                <p class="mb-0">後端防線已失守：您在點選「領取免費 iPhone」時，實際上點擊了隱藏的 iframe 按鈕，導致資料庫中 <strong><?= $deleted ?></strong> 筆活動報名紀錄被<strong>真實刪除</strong>！</p>
             <?php else: ?>
                 <p class="mb-0">（訪客身分模擬成功）：雖然您目前未登入，但點擊已被透明的 iframe 攔截並發送了 POST 請求。若為登入使用者，其所有活動報名已遭清空！</p>
             <?php endif; ?>

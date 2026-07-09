@@ -70,12 +70,12 @@ $students = [
                     
                     <div class="alert alert-warning mt-4">
                         💡 <strong>教學步驟指引：</strong><br>
-                        1. 開啟 **OWASP ZAP**。<br>
-                        2. 點選 ZAP 上方的 **"Scripts"** 頁籤（若沒看到，點選綠色加號 `+` -> `Scripts`）。<br>
-                        3. 在 `Scripts` 目錄樹的 **"Passive Rules"** 上點擊右鍵 -> **"New Script..."**。<br>
+                        1. 開啟 <strong>OWASP ZAP</strong>。<br>
+                        2. 點選 ZAP 上方的 <strong>"Scripts"</strong> 頁籤（若沒看到，點選綠色加號 `+` -> `Scripts`）。<br>
+                        3. 在 `Scripts` 目錄樹的 <strong>"Passive Rules"</strong> 上點擊右鍵 -> <strong>"New Script..."</strong>。<br>
                         4. 腳本名稱填入 `PII_Detector`，類型選 `Passive Rules`，腳本引擎選 `Oracle Nashorn` (或 `Graal.js`)，範本選 `Empty`。<br>
-                        5. 將右側的 JavaScript 程式碼貼入腳本編輯區，點選儲存 (Save)，並點擊右鍵選擇 **"Enable Script"** 啟用。<br>
-                        6. 用瀏覽器重新載入此網頁，觀察 ZAP 的 **"Alerts (警報)"** 面板，您將會看見由我們自訂腳本發出的身分證與手機洩漏警報！
+                        5. 將右側的 JavaScript 程式碼貼入腳本編輯區，點選儲存 (Save)，並點擊右鍵選擇 <strong>"Enable Script"</strong> 啟用。<br>
+                        6. 用瀏覽器重新載入此網頁，觀察 ZAP 的 <strong>"Alerts (警報)"</strong> 面板，您將會看見由我們自訂腳本發出的身分證與手機洩漏警報！
                     </div>
                 </div>
             </div>

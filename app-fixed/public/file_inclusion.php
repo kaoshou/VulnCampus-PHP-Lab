@@ -75,7 +75,7 @@ if ($page !== '') {
                     
                     <div class="alert alert-success mt-4">
                         🛡️ <strong>防護說明：</strong><br>
-                        安全修正版配置了硬編碼的**白名單校驗**，僅允許輸入白名單鍵值（如 <code>about.php</code>）。任何嘗試輸入 <code>/etc/passwd</code>、<code>../</code> 或外部 http 連結都會被直接安全封鎖。
+                        安全修正版配置了硬編碼的<strong>白名單校驗</strong>，僅允許輸入白名單鍵值（如 <code>about.php</code>）。任何嘗試輸入 <code>/etc/passwd</code>、<code>../</code> 或外部 http 連結都會被直接安全封鎖。
                     </div>
                 </div>
             </div>

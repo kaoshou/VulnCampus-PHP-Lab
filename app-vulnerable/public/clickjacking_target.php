@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="text-center mt-3">
             <h5 class="text-danger font-weight-bold">💥 警告：您已中招！</h5>
             <?php if ($is_logged_in): ?>
-                <p class="text-muted small mb-2">已在您不知情下，成功清空了您的 **<?= $deleted_count ?>** 筆活動報名紀錄！</p>
+                <p class="text-muted small mb-2">已在您不知情下，成功清空了您的 <strong><?= $deleted_count ?></strong> 筆活動報名紀錄！</p>
             <?php else: ?>
                 <p class="text-muted small mb-2">（目前為訪客身分）若您已登入，此動作會立刻將您的活動報名紀錄清空！</p>
             <?php endif; ?>
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     <?php else: ?>
         <h5 class="text-dark font-weight-bold">📅 活動報名管理設定</h5>
-        <p class="text-muted small">點擊下方按鈕將立刻**取消並清空**您所有的活動報名歷史紀錄：</p>
+        <p class="text-muted small">點擊下方按鈕將立刻<strong>取消並清空</strong>您所有的活動報名歷史紀錄：</p>
         
         <form method="POST">
             <button type="submit" id="critical-button" class="btn btn-danger shadow-sm">

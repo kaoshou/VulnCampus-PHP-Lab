@@ -63,7 +63,7 @@ $file = $_GET['file'] ?? 'default_avatar.svg';
                 
                 <div class="alert alert-danger">
                     🚨 <strong>漏洞成因：</strong><br>
-                    弱點版中的 <code>show_image.php</code> 在讀取檔案時，直接將傳入的參數拼接到路徑中，且**未限制目錄穿越字元 (<code>../</code>)**。這會允許任何人跳脫圖片資料夾，讀取伺服器內部任何檔案。
+                    弱點版中的 <code>show_image.php</code> 在讀取檔案時，直接將傳入的參數拼接到路徑中，且<strong>未限制目錄穿越字元 (<code>../</code>)</strong>。這會允許任何人跳脫圖片資料夾，讀取伺服器內部任何檔案。
                 </div>
 
                 <div class="alert alert-info">
