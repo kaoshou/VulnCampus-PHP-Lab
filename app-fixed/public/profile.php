@@ -32,12 +32,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $student_no = trim($_POST['student_no'] ?? '');
     $national_id_fake = trim($_POST['national_id_fake'] ?? '');
     $password = trim($_POST['password'] ?? '');
+    $confirm_password = trim($_POST['confirm_password'] ?? '');
     
     // 修補重點 2：Mass Assignment 防禦。後端完全忽略前端 POST 傳入的 role 隱藏欄位，由後端邏輯決定角色
     // 此處不從 $_POST['role'] 讀取值寫入 SQL
 
     if ($name === '' || $email === '') {
         $error = '姓名與電子郵件為必填欄位。';
+    } elseif ($password !== '' && $password !== $confirm_password) {
+        $error = '🚫 更新失敗：新密碼與確認密碼不一致！';
+    } elseif ($password !== '' && (
+        strlen($password) < 8 ||
+        !preg_match('/[A-Z]/', $password) ||
+        !preg_match('/[a-z]/', $password) ||
+        !preg_match('/[0-9]/', $password) ||
+        !preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)
+    )) {
+        $error = '🚫 更新失敗：密碼強度不足！長度必須至少 8 個字元，且同時包含英文大小寫字母、數字及特殊符號。';
     } else {
         try {
             // 修補重點 3：參數化查詢，並排除 role 欄位更新，防範 Mass Assignment 越權升權
@@ -51,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'id' => $id
             ]);
 
-            // 安全修補：如果密碼不為空，將其使用 password_hash 雜湊後安全寫入資料庫
+            // 安全修補：如果密碼不為空且已通過上述驗證，將其使用 password_hash 雜湊後安全寫入資料庫
             if ($password !== '') {
                 $pw_hash = password_hash($password, PASSWORD_DEFAULT);
                 $pw_stmt = $pdo->prepare("UPDATE users SET password = :password WHERE id = :id");
@@ -165,9 +176,19 @@ try {
                     </div>
 
                     <div class="form-group row mb-3">
-                        <label for="password" class="col-sm-3 col-form-label font-weight-bold">變更登入密碼：</label>
+                        <label for="password" class="col-sm-3 col-form-label font-weight-bold">新登入密碼：</label>
                         <div class="col-sm-9">
                             <input type="password" name="password" id="password" class="form-control" placeholder="留空代表不修改密碼">
+                            <div class="form-text text-success small mt-1">
+                                🛡️ <strong>安全強度要求 (CWE-521)</strong>：必須至少 8 個字元，且包含英文大小寫字母、數字及特殊符號。
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row mb-3">
+                        <label for="confirm_password" class="col-sm-3 col-form-label font-weight-bold">確認新密碼：</label>
+                        <div class="col-sm-9">
+                            <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="請再次輸入新密碼">
                         </div>
                     </div>
                     

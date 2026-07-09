@@ -371,6 +371,15 @@ require_once __DIR__ . '/../src/helpers.php';
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">📄 PDF 嵌入跨站腳本 (PDF-based XSS)</h5>
+                            <p class="card-text">上傳成果 PDF 檔案，若前端未進行沙盒防範直接使用 iframe 嵌入，PDF 內置 JS 會在同源下執行並竊取 Session 與 LocalStorage。</p>
+                            <a href="/pdf_xss_demo.php" class="btn btn-primary">進入 PDF XSS 演練</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

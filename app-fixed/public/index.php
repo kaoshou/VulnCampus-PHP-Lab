@@ -353,6 +353,15 @@ require_once __DIR__ . '/../src/helpers.php';
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-success">📄 PDF 嵌入安全防護 (PDF-based XSS 防禦)</h5>
+                            <p class="card-text text-muted flex-grow-1">使用 <code>sandbox</code> 屬性將 iframe 沙盒化，禁用 PDF 中的惡意 JS 執行，或強制配置下載回應標頭防止瀏覽器同源解析。</p>
+                            <a href="/pdf_xss_demo.php" class="btn btn-outline-primary mt-2">進入 PDF XSS 演練</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

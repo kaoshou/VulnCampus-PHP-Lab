@@ -49,12 +49,12 @@ docker compose up -d --build
 
 本系統預置了以下三種角色的測試帳密，供手動測試與 ZAP 認證掃描使用：
 
-| 角色 / 權限 | 帳號 (Username) | 弱點版密碼 (MD5 儲存) | 修正版密碼 (Bcrypt 儲存) | 說明 |
+| 角色 / 權限 | 帳號 (Username) | 弱點版密碼 | 修正版密碼 | 說明 |
 | :--- | :--- | :--- | :--- | :--- |
 | **管理員** | `admin` | `admin` | `AdminPassword!2026` | 後台高權限管理員，具備診斷與名冊匯出權限 |
-| **一般學生 01** | `student01` | `password123` | `password123` | 用於正常瀏覽、留言與活動報名 |
-| **一般學生 02** | `student02` | `password123` | `password123` | 用於測試 IDOR 越權 (例如 student01 可修改或取消其檔案) |
-| **教師** | `teacher01` | `password123` | `password123` | 可以查看自己教授的課程 |
+| **一般學生 01** | `student01` | `password123` | `Student01Pass!2026` | 用於正常瀏覽、留言與活動報名 |
+| **一般學生 02** | `student02` | `password123` | `Student02Pass!2026` | 用於測試 IDOR 越權 (例如 student01 可修改或取消其檔案) |
+| **教師** | `teacher01` | `password123` | `Teacher01Pass!2026` | 可以查看自己教授的課程 |
 
 ---
 

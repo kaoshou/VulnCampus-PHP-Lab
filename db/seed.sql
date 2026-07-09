@@ -59,15 +59,16 @@ INSERT INTO stored_messages (id, name, content) VALUES
 -- ==========================================
 USE fixed_db;
 
--- 插入使用者 (密碼為 Bcrypt 雜湊，預設為 password123)
--- Bcrypt of password123: $2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi
--- admin 密碼使用：admin (Bcrypt 雜湊以供便利測試)
--- Bcrypt of admin: $2y$10$DC5a9K69M5pjQTSooboor.s39OZxKTfeawBo0mu9w8VSpy27EyFDK
+-- 插入使用者 (密碼皆為強密碼 Bcrypt 雜湊以展現安全防禦)
+-- Admin: AdminPassword!2026 ($2y$10$f8JfZXPJBFWtyoLuzRWY7.MWUA.wcJdFWFr8t2S61BpKHhvLNJaAO)
+-- Student01: Student01Pass!2026 ($2y$10$iu24HTAN.TMAsufok7LCCeanUQQ3MRSWApI0qD7QF7QXTCXDCiYDq)
+-- Student02: Student02Pass!2026 ($2y$10$lQXMm9oxxfYKNYJvGHTeRei0kN44kVvTIpqJxnR6bRBVmnIF5zVra)
+-- Teacher01: Teacher01Pass!2026 ($2y$10$SqJ.Q/wqmmxiZZdVqjlvdeJhGFDUwicTZlZjNmuR/e8X5jAfdiZam)
 INSERT INTO users (id, username, password_hash, role, name, email, phone, student_no, national_id_fake) VALUES
-(1, 'admin', '$2y$10$DC5a9K69M5pjQTSooboor.s39OZxKTfeawBo0mu9w8VSpy27EyFDK', 'admin', '系統管理員', 'admin@vulncampus.local', '0912-345-678', 'AD001', 'A123456789'),
-(2, 'student01', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '王小明', 'student01@vulncampus.local', '0922-111-222', 'ST001', 'B198765432'),
-(3, 'student02', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'student', '李小美', 'student02@vulncampus.local', '0933-222-333', 'ST002', 'F299887766'),
-(4, 'teacher01', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'teacher', '鄭老師', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
+(1, 'admin', '$2y$10$f8JfZXPJBFWtyoLuzRWY7.MWUA.wcJdFWFr8t2S61BpKHhvLNJaAO', 'admin', '系統管理員', 'admin@vulncampus.local', '0912-345-678', 'AD001', 'A123456789'),
+(2, 'student01', '$2y$10$iu24HTAN.TMAsufok7LCCeanUQQ3MRSWApI0qD7QF7QXTCXDCiYDq', 'student', '王小明', 'student01@vulncampus.local', '0922-111-222', 'ST001', 'B198765432'),
+(3, 'student02', '$2y$10$lQXMm9oxxfYKNYJvGHTeRei0kN44kVvTIpqJxnR6bRBVmnIF5zVra', 'student', '李小美', 'student02@vulncampus.local', '0933-222-333', 'ST002', 'F299887766'),
+(4, 'teacher01', '$2y$10$SqJ.Q/wqmmxiZZdVqjlvdeJhGFDUwicTZlZjNmuR/e8X5jAfdiZam', 'teacher', '鄭老師', 'teacher01@vulncampus.local', '0944-333-444', 'TE001', 'H188776655');
 
 -- 插入課程資料
 INSERT INTO courses (id, title, teacher_id, description, classroom, credit) VALUES

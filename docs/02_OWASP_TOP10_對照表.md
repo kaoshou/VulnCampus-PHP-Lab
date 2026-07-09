@@ -779,11 +779,13 @@
 
 ---
 
-## 補充演練 - 個人資料修改頁面明文密碼外洩 (CWE-319 / CWE-522)
+## 補充演練 - 明文密碼外洩與密碼強度政策缺陷 (CWE-319 / CWE-521 / CWE-522)
 
 ### 1. 漏洞頁面與成因
 - **頁面**：`/profile.php`
-- **成因**：後端將使用者的敏感密碼以明文存放在資料庫中，且在個人資料修改表單呈現時，**直接將該明文密碼帶入 <code>&lt;input type="password"&gt;</code> 的 <code>value</code> 屬性中**。雖然網頁畫面上看似為隱碼（黑點），但任何人只需打開 F12 審查元素將 <code>type="password"</code> 變更為 <code>type="text"</code> 即可直接看穿使用者的明文登入密碼。
+- **成因**：
+  1. **敏感資訊明文外洩 (CWE-319 / CWE-522)**：後端將使用者的敏感密碼以明文存放在資料庫中，且在個人資料修改表單呈現時，**直接將該明文密碼帶入 <code>&lt;input type="password"&gt;</code> 的 <code>value</code> 屬性中**。學員只需在 F12 審查元素中將 <code>type="password"</code> 改成 <code>type="text"</code> 即可直接看穿密碼。
+  2. **密碼強度要求缺陷 (CWE-521)**：弱點版完全沒有限制密碼強度，也沒有提供二次密碼輸入確認（防錯機制），導致使用者可以設定極為簡單的密碼（如 12345），容易遭受密碼爆破。
 
 ### 2. 手動驗證與 ZAP 檢驗
 - **手動驗證**：
@@ -791,24 +793,68 @@
   2. 造訪個人資料頁：`http://localhost:8080/profile.php`。
   3. 按 F12 打開開發者工具，找到密碼輸入框 `<input type="password" id="password" ...>`。
   4. 雙擊修改其屬性，將 `type="password"` 改為 `type="text"`，會發現密碼欄位直接以明文顯現為 `password123`，證明存在嚴重敏感個資洩漏。
+  5. 試圖隨意輸入單個字母 `a` 並點擊更新，弱點版會直接放行並更新，完全沒有複雜度校驗。
 
 ### 3. 程式修補對照
 - **弱點版** (`app-vulnerable/public/profile.php`)：
   ```html
   <!-- 不安全：在 value 屬性中硬編碼直接帶出使用者的明文密碼 -->
-  <input type="password" name="password" value="<?= $profile['password'] ?>">
+  <input type="password" name="password" value="<?= $profile['password_hash'] ?>">
   ```
 - **修正版** (`app-fixed/public/profile.php`)：
+  1. **雙重輸入防錯 (UX 安全)**：在前端放置兩個密碼框以防輸入錯誤：
+     ```html
+     <input type="password" name="password" placeholder="留空代表不修改密碼">
+     <input type="password" name="confirm_password" placeholder="請再次輸入新密碼">
+     ```
+  2. **密碼強度複雜度驗證 (CWE-521)**：後端以 Regex 強制校驗新密碼強度，並使用安全 Bcrypt 雜湊加密：
+     ```php
+     if ($password !== '' && $password !== $confirm_password) {
+         $error = '🚫 更新失敗：新密碼與確認密碼不一致！';
+     } elseif ($password !== '' && (
+         strlen($password) < 8 ||
+         !preg_match('/[A-Z]/', $password) ||
+         !preg_match('/[a-z]/', $password) ||
+         !preg_match('/[0-9]/', $password) ||
+         !preg_match('/[!@#$%^&*(),.?":{}|<>]/', $password)
+     )) {
+         $error = '🚫 更新失敗：密碼強度不足！長度必須至少 8 個字元，且同時包含大小寫字母、數字及特殊符號。';
+     } else {
+         // 使用 password_hash 進行 bcrypt 雜湊更新...
+     }
+     ```
+
+---
+
+## 補充演練 - PDF 嵌入跨站腳本攻擊 (PDF-based XSS - CWE-79)
+
+### 1. 漏洞頁面與成因
+- **頁面**：`/pdf_xss_demo.php`
+- **成因**：
+  許多開發者誤以為 PDF 是純靜態圖文格式，但其實 PDF 支援嵌入並執行 JavaScript (OpenAction)。
+  1. **同源腳本執行 (Stored XSS / CWE-79)**：如果系統允許上傳 PDF 檔案，並在前端使用普通 `<iframe>` 或 `<embed>` 直接渲染該檔案，惡意 PDF 內的 JS 就會與本站共享相同的同源（Same-Origin）權限。
+  2. **隱私數據外洩**：這會導致攻擊者能藉由 PDF JavaScript 跨框架存取父網域的 `localStorage` / `document.cookie`，進而竊取敏感的會話 Token 或個資。
+
+### 2. 手動驗證與 ZAP 檢驗
+- **手動驗證**：
+  1. 登入弱點版網址 `http://localhost:8080/pdf_xss_demo.php`。
+  2. 點擊「下載 PDF XSS PoC 檔案」，下載一個內嵌 JS 的特製檔案 `xss-poc.pdf`。
+  3. 將 `xss-poc.pdf` 檔案上傳。
+  4. 上傳成功後，瀏覽器預覽該 PDF 時會執行其中的 OpenAction 腳本，**自動跳出彈窗並顯示您在父視窗 localStorage 中的敏感 API Token**，表示 Stored XSS 攻擊成功。
+
+### 3. 程式修補對照
+- **弱點版** (`app-vulnerable/public/pdf_xss_demo.php`)：
   ```html
-  <!-- 安全：密碼欄位強制為空，不可帶出任何舊密碼，並提供 placeholder 指引 -->
-  <input type="password" name="password" placeholder="留空代表不修改密碼">
+  <!-- 漏洞點：未加 sandbox 屬性，允許 PDF 執行 JavaScript 跨來源操作父框架 -->
+  <iframe src="/uploads/your_file.pdf" width="100%" height="500px"></iframe>
   ```
-  後端於更新時，若密碼不為空，則使用 Bcrypt 進行安全雜湊後寫入資料庫：
-  ```php
-  if ($password !== '') {
-      $pw_hash = password_hash($password, PASSWORD_DEFAULT);
-      // 安全參數化查詢更新 password ...
-  }
-  ```
-
-
+- **修正版** (`app-fixed/public/pdf_xss_demo.php`)：
+  1. **前端沙盒化 (Sandbox iframe)**：iframe 強制加上 `sandbox="allow-same-origin"` 屬性且不啟用 `allow-scripts`。這允許正常預覽 PDF 的視覺內容，但瀏覽器會強制禁用該 PDF 內部一切 JS 的執行：
+     ```html
+     <iframe src="/uploads/your_file.pdf" sandbox="allow-same-origin" width="100%" height="500px"></iframe>
+     ```
+  2. **下載標頭隔離 (Attachment Header)**：對於敏感的 PoC PDF 檔案下載點，後端強制輸出附件標頭，消除瀏覽器同源解析的攻擊面：
+     ```php
+     header('Content-Type: application/pdf');
+     header('Content-Disposition: attachment; filename="document.pdf"');
+     ```
