@@ -476,7 +476,7 @@ require_once __DIR__ . '/../src/helpers.php';
             <div class="col-md-5 mb-4">
                 <span class="footer-logo">🛡️ VulnCampus PHP Lab (修正版)</span>
                 <p class="text-muted small pr-md-4">
-                    本教學靶場專為《網站弱點檢測與安全改善：OWASP ZAP 應用》設計，模擬「校園活動、課程查詢與報名平台」之常見漏洞架構，帶領學員實踐 OWASP Top 10 的檢測與修補技術。
+                    本教學靶場專為《網站弱點檢測與安全改善：ZAP 應用實務》設計，模擬「校園活動、課程查詢與報名平台」之常見漏洞架構，帶領學員實踐 OWASP Top 10 的檢測與修補技術。
                 </p>
                 <div class="mt-3">
                     <span class="badge badge-success-glow">🟢 安全修補完成</span>
