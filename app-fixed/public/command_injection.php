@@ -18,12 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ip'])) {
         $safe_ip = escapeshellarg($ip);
         
         if (stristr(php_uname("s"), "Windows")) {
-            $raw_output = shell_exec("ping -n 3 " . $safe_ip);
+            $raw_output = shell_exec("ping -n 3 " . $safe_ip . " 2>&1");
             if ($raw_output) {
                 $output = mb_convert_encoding($raw_output, 'UTF-8', 'BIG5');
             }
         } else {
-            $output = shell_exec("ping -c 3 " . $safe_ip);
+            $output = shell_exec("ping -c 3 " . $safe_ip . " 2>&1");
         }
     } else {
         $error = "❌ 安全警告：輸入包含非法字元或格式不正確！必須為合法的 IP 地址或主機名稱。";

@@ -20,9 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ip !== '') {
         $safe_ip = escapeshellarg($ip);
         
         if (stristr(PHP_OS, 'WIN')) {
-            $cmd = "ping -n 1 " . $safe_ip;
+            $cmd = "ping -n 1 " . $safe_ip . " 2>&1";
         } else {
-            $cmd = "ping -c 1 " . $safe_ip;
+            $cmd = "ping -c 1 " . $safe_ip . " 2>&1";
         }
         
         $output = shell_exec($cmd);

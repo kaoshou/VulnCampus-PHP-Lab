@@ -9,7 +9,8 @@
 
 1. **僅供本機教學與授權演練**：本專案只用於合法授權的本機安全研究與教學環境，嚴禁將弱點版 (Vulnerable App) 部署到公開網域或生產環境！
 2. **無真實個資**：本專案所有使用者資料、身分證字號、聯絡電話、信箱等均為自動產生的虛擬假個資，絕無真實個資洩漏。
-3. **無安全風險工具**：本專案不包含任何惡意攻擊或連線外部非法 C2 伺服器的指令與木馬，請安心使用。
+3. **教學漏洞專用與環境安全**：本專案為資安教學與漏洞防禦對照設計之靶場，**內含刻意保留之真實安全漏洞**（如系統命令注入、SQL 注入、跨站腳本與權限缺失等）。本靶場**僅限本機封閉環境演練，嚴禁暴露於網際網路或未受信任的網路環境**。
+4. **不使用時請關閉服務**：課程演練結束或暫不使用時，**請務必執行 `docker compose down` 關閉所有容器**，避免本機成為潛在的網路受攻擊面。
 
 ---
 
@@ -25,23 +26,40 @@
 
 ## 🚀 快速啟動指引
 
-請確保本機已安裝 [Docker](https://www.docker.com/) 與 Docker Compose，然後在專案根目錄下執行以下指令：
+### 方法一：使用一鍵管理腳本 (推薦學員快速操作)
+- **Windows (點兩下或於 PowerShell 執行)**：
+  - `start.bat`：一鍵啟動靶場服務（首次啟動請等待 10~15 秒供資料庫完成初始化）。
+  - `stop.bat`：一鍵停止靶場容器。
+  - `reset.bat`：**一鍵重置靶場**（當資料庫被改壞或想清除測試上傳檔案時，點擊此腳本 10 秒快速自救還原！）。
+- **macOS / Linux (終端機執行)**：
+  - `bash start.sh`：一鍵啟動靶場（或先執行 `chmod +x *.sh` 後輸入 `./start.sh`）
+  - `bash stop.sh`：一鍵停止靶場
+  - `bash reset.sh`：一鍵重置資料庫與靶場環境
 
-### 1. 啟動服務 (自動建置並執行)
-```bash
-docker compose up -d --build
-```
+### 方法二：使用標準原生 Docker Compose 指令 (跨平台通用 / 避免腳本突發狀況)
+若不想使用腳本，或遇到腳本權限問題，可直接在終端機（PowerShell / Command Prompt / Terminal）使用標準 Docker 指令：
 
-### 2. 停止並保留資料
-```bash
-docker compose down
-```
-
-### 3. 重建資料庫並徹底清除舊資料
-```bash
-docker compose down -v
-docker compose up -d --build
-```
+1. **啟動靶場服務 (背景執行並自動重新建置)**：
+   ```bash
+   docker compose up -d --build
+   ```
+2. **停止靶場運行 (保留現有資料庫數據)**：
+   ```bash
+   docker compose down
+   ```
+3. **徹底清除舊資料並重置為初始狀態 (還原預設種子資料庫)**：
+   ```bash
+   docker compose down -v
+   docker compose up -d --build
+   ```
+4. **檢視容器運行狀態**：
+   ```bash
+   docker compose ps
+   ```
+5. **檢視即時容器日誌**：
+   ```bash
+   docker compose logs -f
+   ```
 
 ## 🛡️ 安全掛載與演練隔離防護 (Docker Volumes)
 
@@ -68,13 +86,16 @@ docker compose up -d --build
 
 ```text
 vuln-campus-php-lab/
-├── docker-compose.yml        # Docker 服務定義
+├── docker-compose.yml        # Docker 服務定義 (含 MariaDB 健康檢查)
 ├── README.md                 # 本說明文件
-├── app-vulnerable/           # 弱點版網站目錄
-│   ├── public/               # Web 根目錄 (含 courses.php, login.php, messages.php 等)
+├── start.bat / start.sh      # 一鍵啟動腳本 (Windows / Mac-Linux)
+├── stop.bat / stop.sh        # 一鍵停止腳本
+├── reset.bat / reset.sh      # 一鍵還原與清除舊資料庫腳本
+├── app-vulnerable/           # 弱點版網站目錄 (Port 8080)
+│   ├── public/               # Web 根目錄 (courses.php, login.php 等)
 │   ├── src/                  # 資料庫與 Session 設定 (db.php, helpers.php)
-│   └── Dockerfile            # 弱點版映像建置設定
-├── app-fixed/                # 安全修正版網站目錄 (結構與弱點版對稱，但已做安全防護)
+│   └── Dockerfile            # 弱點版映像建置設定 (內含 gcc, ping)
+├── app-fixed/                # 安全修正版網站目錄 (Port 8081)
 │   ├── public/
 │   ├── src/
 │   └── Dockerfile
@@ -82,13 +103,17 @@ vuln-campus-php-lab/
 │   ├── init.sql              # 資料庫 schema 建立 (建立 vuln_db 與 fixed_db)
 │   └── seed.sql              # 初始測試資料與密碼雜湊置入
 ├── docs/                     # 教學說明文件 (繁體中文，適合課程教材)
+│   ├── 00_課程教材_WEB安全與OWASP_ZAP實踐指南.md # 完整課程大綱與觀念講義
 │   ├── 01_課程靶場使用說明.md # 靶場操作基礎與 Docker 啟動教學
 │   ├── 02_OWASP_TOP10_對照表.md # 十大弱點在靶場中的分布、手動驗證與修補對照
 │   ├── 03_ZAP_掃描操作手冊.md  # ZAP Spider/Active Scan/認証掃描實務操作
 │   ├── 04_修補前後比較表.md   # 提供學員演練撰寫的修補對照模板
 │   ├── 05_教師用弱點答案對照表.md # 教師演示各漏洞、手動改包與上課重點指引
-│   └── 06_常見問題排除.md    # 解決資料庫連線、ZAP 認證設定及 Proxy 常見故障
-├── zap/                      # ZAP 範例設定檔 (Baseline/Active Scan 參數)
+│   ├── 06_常見問題排除.md    # 解決資料庫連線、ZAP 認證設定及 Proxy 常見故障
+│   └── 07_學員課堂實作闖關檢核表.md # 課堂實作任務指引與作業簽核表
+├── zap/                      # ZAP 設定檔
+│   ├── VulnCampus_Default.context # ZAP 預設認證 Context (可一鍵匯入)
+│   └── zap-baseline-example.yaml  # 自動化 CI/CD 掃描設定範例
 └── reports/                  # ZAP 掃描報告範例 (Before/After 成果對比)
 ```
 
@@ -128,6 +153,6 @@ vuln-campus-php-lab/
 ## 👤 作者與專案資訊
 
 - **專案名稱**：VulnCampus PHP Lab (校園活動與課程報名平台教學靶場)
-- **內容設計**：崑山科科技大學 鄭郁翰 老師
+- **內容設計**：崑山科科技大學 鄭郁翰
 - **適用課程**：網站弱點檢測與安全改善：ZAP 應用實務、安全程式碼編寫 (Secure Coding)
 - **專案目的**：專為教學與學術研究設計的 Web 漏洞修補對照靶場，嚴禁部署於公開網路。

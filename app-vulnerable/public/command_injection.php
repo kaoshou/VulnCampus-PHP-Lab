@@ -11,13 +11,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ip'])) {
     if (stristr(php_uname("s"), "Windows")) {
         // Windows 環境下使用 ping -n 3
         // 為了支援繁體中文 Windows 伺服器，對 shell 輸出進行 BIG5 到 UTF-8 的轉碼
-        $raw_output = shell_exec("ping -n 3 " . $ip);
+        $raw_output = shell_exec("ping -n 3 " . $ip . " 2>&1");
         if ($raw_output) {
             $output = mb_convert_encoding($raw_output, 'UTF-8', 'BIG5');
         }
     } else {
         // Linux 環境下使用 ping -c 3
-        $output = shell_exec("ping -c 3 " . $ip);
+        $output = shell_exec("ping -c 3 " . $ip . " 2>&1");
     }
 }
 ?>

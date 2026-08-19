@@ -12,6 +12,12 @@ services:
       - ./db:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mariadb-admin", "ping", "-h", "localhost", "-prootpassword"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
     networks:
       - vuln-network
 
@@ -28,7 +34,8 @@ services:
       - ./app-vulnerable/src:/var/www/html/src:ro
       - vuln-vulnerable-uploads:/var/www/html/public/uploads
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - vuln-network
 
@@ -45,7 +52,8 @@ services:
       - ./app-fixed/src:/var/www/html/src:ro
       - vuln-fixed-uploads:/var/www/html/public/uploads
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - vuln-network
 
@@ -61,7 +69,8 @@ services:
       PMA_USER: root
       PMA_PASSWORD: rootpassword
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - vuln-network
 

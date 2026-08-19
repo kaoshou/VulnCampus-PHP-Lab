@@ -12,10 +12,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ip !== '') {
     // 直接將輸入拼入 shell 命令中執行。在 Linux 下可以使用 127.0.0.1; whoami 來進行測試
     if (stristr(PHP_OS, 'WIN')) {
         // 如果在 Windows 環境下測試
-        $cmd = "ping -n 1 " . $ip;
+        $cmd = "ping -n 1 " . $ip . " 2>&1";
     } else {
         // 在 Docker Container (Linux) 環境下
-        $cmd = "ping -c 1 " . $ip;
+        $cmd = "ping -c 1 " . $ip . " 2>&1";
     }
     
     // 執行命令並捕獲輸出

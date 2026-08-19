@@ -10,13 +10,21 @@
 * 弱點版位址：`http://localhost:8080`
 * 修正版位址：`http://localhost:8081`
 
-### 設定 ZAP 代理
+### 設定 ZAP 代理與建議瀏覽器模式
 1. 開啟 **OWASP ZAP**。
-2. 點選上方選單 **Tools (工具) > Options (選項)**。
-3. 尋找 **Local Servers/Proxies (本機伺服器與代理)**。
-4. 將 ZAP 的 Local Proxy Port 修改為 **`8090`** (因為 8080/8081 已被靶場佔用)， Address 設為 `localhost` 或 `127.0.0.1`。
-5. 設定您瀏覽器的 Proxy (代理伺服器) 指向 `127.0.0.1:8090`。
-   *💡 **快捷技巧**：最直覺的做法是點選 ZAP 畫面右上角或 Quick Start 面板的 **"Manual Explore" (手動探索)** 點選 **"Launch Browser" (啟動瀏覽器)**。ZAP 會自動開啟一個為您配置妥當代理的專屬 Chromium 瀏覽器。*
+2. **🌟 最推薦做法（防呆首選）**：
+   - 點選 ZAP 畫面右上角或 Quick Start 面板的 **"Manual Explore" (手動探索)**。
+   - 點選 **"Launch Browser" (啟動瀏覽器)**。
+   - **為什麼優先使用 Launch Browser？**
+     - ✅ **免安裝 CA 根憑證**：不會出現 HTTPS 憑證不受信任或被封鎖的紅字。
+     - ✅ **自動解除 Bypass 限制**：一般 Chrome/Edge 預設會繞過 `localhost` / `127.0.0.1` 的 Proxy 設定導致抓不到封包，ZAP 內建瀏覽器會自動停用 Bypass，確保 100% 成功攔截流量。
+     - ✅ **與個人日常瀏覽器完全隔離**：不會影響學員本機其他網頁的分頁。
+3. **若需使用自訂瀏覽器手動設定代理**：
+   - 開啟選項設定：
+     - **Windows / Linux**：點選上方選單 **Tools (工具) > Options (選項) > Local Servers/Proxies**
+     - **macOS**：點選螢幕左上方選單 **ZAP > Settings (或 Preferences)**，快捷鍵為 **`Cmd + ,`**，尋找 **Local Servers/Proxies**
+   - 將 ZAP 的 Local Proxy Port 修改為 **`8090`** (因為 8080/8081 已被靶場佔用)，Address 設為 `localhost` 或 `127.0.0.1`。
+   - 設定您瀏覽器的 Proxy 指向 `127.0.0.1:8090`。
 
 ---
 
@@ -87,16 +95,28 @@
 
 許多重要功能必須在登入後才能存取。ZAP 提供認證管理，確保掃描能穿透登入機制。
 
-### 配置自動登入 (Form-based Auth)
+### 🌟 方法一：一鍵匯入預設 Context（最推薦 / 3 秒就緒）
+專案已預置好完整的 Context 設定檔，包含目標範圍、排除 logout.php、Form 登入規則與 `student01` 測試帳號：
+1. 點選 ZAP 上方選單 **File (檔案) > Import Context... (匯入 Context)**。
+2. 選擇專案目錄中的 **`zap/VulnCampus_Default.context`** 檔案並開啟。
+3. 在左側 Context 面板即會出現 `VulnCampus-Vulnerable`。
+4. 點選頂端工具列的 **鎖頭圖示 (Forced User Mode)**，選取 `student01` 即可立即進行認證掃描！
+
+---
+
+### 方法二：手動逐步配置自動登入 (Form-based Auth)
 1. 在左側 Sites 對靶場 `http://localhost:8080` 點選右鍵 -> **Include in Context > Default Context**。
-2. 進入 ZAP 瀏覽器進行手動登入。在底部的 **History** 尋找 `POST:login.php` 的登入請求。
-3. 對該筆請求點選右鍵 -> **Flag as Context > Default Context: Form-based Auth Target**。
-4. ZAP 會彈出 Context 配置畫面。確認 Username、Password 參數映射無誤。
+2. **⚠️ 重要防呆：排除登出網址 (防止掃描中斷)**：
+   - 找到 `http://localhost:8080/logout.php`，點選右鍵 -> **Exclude from Context > Default Context**（或 **Exclude from > Active Scan**）。
+   - *原因：若未排除，ZAP 掃描到 `logout.php` 會導致 Session 被直接銷毀登出，使後續需權限的頁面全部漏掃。*
+3. 進入 ZAP 瀏覽器進行手動登入。在底部的 **History** 尋找 `POST:login.php` 的登入請求。
+4. 對該筆請求點選右鍵 -> **Flag as Context > Default Context: Form-based Auth Target**。
+5. ZAP 會彈出 Context 配置畫面。確認 Username、Password 參數映射無誤。
    - **Logged In Indicator (登入成功標記)**：填入 `\Qlogout.php\E` (或 `登出`)。
    - **Logged Out Indicator (登入失效標記)**：填入 `\Qlogin.php\E` (或 `登入`)。
-5. 切換至 Context 的 **Users** 面板，點選 **Add** 新增帳號：`student01`，密碼 `password123`，並勾選啟用。
-6. 切換至 **Forced User**，啟用強制使用者，設定為 `student01`。
-7. 在 ZAP 工具列頂端，鎖上 **鎖頭圖示 (Forced User Mode)**，使 ZAP 自動進行登入 Session 檢測。
+6. 切換至 Context 的 **Users** 面板，點選 **Add** 新增帳號：`student01`，密碼 `password123`，並勾選啟用。
+7. 切換至 **Forced User**，啟用強制使用者，設定為 `student01`。
+8. 在 ZAP 工具列頂端，鎖上 **鎖頭圖示 (Forced User Mode)**，使 ZAP 自動進行登入 Session 檢測。
 
 ---
 
@@ -104,7 +124,12 @@
 
 主動掃描 (Active Scan) 會對目標參數發送多種攻擊語句 (SQLi, XSS, Cmd Injection, SSRF, XXE) 以探測系統邊界。
 
-### 執行掃描：
+### 🌟 課堂快速技巧：單一頁面聚焦掃描 (Focused Scanning)
+> 💡 **課堂時間管理秘訣**：對整個 Context 或站台執行 Active Scan 可能需要 10~20 分鐘。在進行特定弱點演練與修補驗證時，**強烈建議只對單一目標頁面進行掃描**！
+> - 例如在 Sites 目錄樹中找到 `courses.php` 或 `course_detail.php`，直接對該節點按右鍵 -> **Attack > Active Scan**。
+> - 這樣只需 5~10 秒即可快速驗證該網頁的 SQLi / XSS 是否存在或已修復完成。
+
+### 全站執行掃描步驟：
 1. 在 Sites 對 `http://localhost:8080` 點選右鍵。
 2. 選擇 **Attack (攻擊) > Active Scan (主動掃描)**。
 3. 在設定面板將 **User** 選為先前配置的 `student01` (若需進行授權後掃描)，點選 **Start Scan**。

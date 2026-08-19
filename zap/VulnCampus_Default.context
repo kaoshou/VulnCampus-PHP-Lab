@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<configuration>
+    <context>
+        <name>VulnCampus-Vulnerable</name>
+        <desc>VulnCampus PHP Lab 預設自動登入與掃描範圍設定檔 (包含 student01 與排除 logout.php)</desc>
+        <inscope>true</inscope>
+        <incregexes>http://localhost:8080.*</incregexes>
+        <incregexes>http://127.0.0.1:8080.*</incregexes>
+        <excregexes>http://localhost:8080/logout\.php.*</excregexes>
+        <excregexes>http://127.0.0.1:8080/logout\.php.*</excregexes>
+        <tech>
+            <include>Db.MySQL</include>
+            <include>Language.PHP</include>
+            <include>OS.Linux</include>
+            <include>WS.Apache</include>
+        </tech>
+        <urlScanExcludedSubtree/>
+        <urlScanIncludedSubtree/>
+        <authentication>
+            <type>2</type>
+            <strategy>EACH_REQ</strategy>
+            <pollurl/>
+            <polldata/>
+            <pollheaders/>
+            <pollfreq>60</pollfreq>
+            <pollunits>REQUESTS</pollunits>
+            <loggedin>\Qlogout.php\E</loggedin>
+            <loggedout>\Qlogin.php\E</loggedout>
+            <form>
+                <loginurl>http://localhost:8080/login.php</loginurl>
+                <loginbody>username={%username%}&amp;password={%password%}</loginbody>
+                <loginpageurl>http://localhost:8080/login.php</loginpageurl>
+            </form>
+        </authentication>
+        <users>
+            <user>101;true;c3R1ZGVudDAx;2;c3R1ZGVudDAx~cGFzc3dvcmQxMjM=~</user>
+        </users>
+        <forceduser>101</forceduser>
+        <session>
+            <type>0</type>
+        </session>
+        <authorization>
+            <type>0</type>
+            <basic>
+                <header/>
+                <body/>
+                <logic>AND</logic>
+                <code>-1</code>
+            </basic>
+        </authorization>
+    </context>
+</configuration>
