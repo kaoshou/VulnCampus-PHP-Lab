@@ -4,6 +4,8 @@ echo "  VulnCampus PHP Lab - 靶場環境一鍵啟動腳本"
 echo "==================================================="
 echo ""
 echo "[1/3] 正在啟動 Docker 容器並建置服務..."
+docker rm -f vuln-db vuln-app-vulnerable vuln-app-fixed vuln-phpmyadmin > /dev/null 2>&1
+docker compose down > /dev/null 2>&1
 docker compose up -d --build
 
 if [ $? -ne 0 ]; then

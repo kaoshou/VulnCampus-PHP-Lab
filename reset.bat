@@ -1,36 +1,39 @@
 @echo off
-chcp 65001 > nul
+title VulnCampus PHP Lab - Reset Database
+cls
 echo ===================================================
-echo   VulnCampus PHP Lab - 靶場一鍵還原/重置腳本
+echo   VulnCampus PHP Lab - Reset & Clean Launcher
 echo ===================================================
 echo.
-echo 注意：此操作將徹底清除所有資料庫修改與上傳檔案，
-echo 並回復至最初乾淨的種子資料狀態。
+echo WARNING: This will remove all database changes and uploaded files,
+echo and reset the environment back to initial clean seed data.
 echo.
-set /p confirm="確認要重置靶場嗎？ (Y/N): "
+set /p confirm="Are you sure you want to reset the lab? (Y/N): "
 if /i "%confirm%" neq "Y" (
-    echo 操作已取消。
+    echo.
+    echo Operation cancelled by user.
+    echo.
     pause
     exit /b 0
 )
 
 echo.
-echo [1/3] 正在銷毀現有磁碟卷與容器...
+echo [1/3] Removing old volumes and containers...
 docker compose down -v
 
 echo.
-echo [2/3] 正在重新建置並啟動乾淨容器...
+echo [2/3] Building and starting clean containers...
 docker compose up -d --build
 
 echo.
-echo [3/3] 等待資料庫重新初始化 (約需 10 秒)...
+echo [3/3] Waiting for MariaDB database to initialize (10s)...
 timeout /t 10 /nobreak > nul
 
 echo.
 echo ===================================================
-echo  靶場已成功還原為初始狀態！
-echo  弱點版網站:  http://localhost:8080
-echo  修正版網站:  http://localhost:8081
+echo   VulnCampus PHP Lab has been reset successfully!
+echo   Vulnerable App:  http://localhost:8080
+echo   Fixed App:       http://localhost:8081
 echo ===================================================
 echo.
 pause

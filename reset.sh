@@ -7,7 +7,7 @@ echo "注意：此操作將徹底清除所有資料庫修改與上傳檔案，"
 echo "並回復至最初乾淨的種子資料狀態。"
 echo ""
 read -p "確認要重置靶場嗎？ (y/N): " confirm
-if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
     echo "操作已取消。"
     exit 0
 fi

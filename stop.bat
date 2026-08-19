@@ -1,13 +1,15 @@
 @echo off
-chcp 65001 > nul
+title VulnCampus PHP Lab - Stop Services
+cls
 echo ===================================================
-echo   VulnCampus PHP Lab - 停止靶場環境
+echo   VulnCampus PHP Lab - Stopping Services
 echo ===================================================
 echo.
-echo 正在停止並保留現有資料...
+echo Stopping Docker containers (Keeping database data)...
+echo.
 docker compose down
 
 echo.
-echo 靶場所有容器已安全停止！
+echo All containers stopped successfully!
 echo.
 pause
