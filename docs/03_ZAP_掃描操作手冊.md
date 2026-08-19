@@ -10,21 +10,58 @@
 * 弱點版位址：`http://localhost:8080`
 * 修正版位址：`http://localhost:8081`
 
-### 設定 ZAP 代理與建議瀏覽器模式
-1. 開啟 **OWASP ZAP**。
-2. **🌟 最推薦做法（防呆首選）**：
-   - 點選 ZAP 畫面右上角或 Quick Start 面板的 **"Manual Explore" (手動探索)**。
-   - 點選 **"Launch Browser" (啟動瀏覽器)**。
-   - **為什麼優先使用 Launch Browser？**
-     - ✅ **免安裝 CA 根憑證**：不會出現 HTTPS 憑證不受信任或被封鎖的紅字。
-     - ✅ **自動解除 Bypass 限制**：一般 Chrome/Edge 預設會繞過 `localhost` / `127.0.0.1` 的 Proxy 設定導致抓不到封包，ZAP 內建瀏覽器會自動停用 Bypass，確保 100% 成功攔截流量。
-     - ✅ **與個人日常瀏覽器完全隔離**：不會影響學員本機其他網頁的分頁。
-3. **若需使用自訂瀏覽器手動設定代理**：
-   - 開啟選項設定：
-     - **Windows / Linux**：點選上方選單 **Tools (工具) > Options (選項) > Local Servers/Proxies**
-     - **macOS**：點選螢幕左上方選單 **ZAP > Settings (或 Preferences)**，快捷鍵為 **`Cmd + ,`**，尋找 **Local Servers/Proxies**
-   - 將 ZAP 的 Local Proxy Port 修改為 **`8090`** (因為 8080/8081 已被靶場佔用)，Address 設為 `localhost` 或 `127.0.0.1`。
-   - 設定您瀏覽器的 Proxy 指向 `127.0.0.1:8090`。
+### 設定模式一：🌟 最推薦做法（防呆首選 / 免裝憑證）
+1. 點選 ZAP 畫面右上角或 Quick Start 面板的 **"Manual Explore" (手動探索)**。
+2. 點選 **"Launch Browser" (啟動瀏覽器)**。
+3. **為什麼優先使用 Launch Browser？**
+   - ✅ **免安裝 CA 根憑證**：不會出現 HTTPS 憑證不受信任或被封鎖的紅字。
+   - ✅ **自動解除 Bypass 限制**：一般 Chrome/Edge 預設會繞過 `localhost` / `127.0.0.1` 的 Proxy 設定導致抓不到封包，ZAP 內建瀏覽器會自動停用 Bypass，確保 100% 成功攔截流量。
+   - ✅ **與個人日常瀏覽器完全隔離**：不會影響學員本機其他網頁的分頁。
+
+---
+
+### 設定模式二：手動設定個人 Google Chrome 代理與安裝根憑證 (進階實務)
+若學員希望使用自己本機日常安裝的 **Google Chrome** 進行檢測，請依序完成以下三大步驟：
+
+#### 步驟 1：修改 ZAP 本機監聽埠口 (避免與靶場 8080 衝突)
+1. 開啟 ZAP 選項設定：
+   - **Windows / Linux**：點選上方選單 **Tools (工具) > Options (選項) > Local Servers/Proxies**
+   - **macOS**：點選螢幕左上方選單 **ZAP > Settings (或 Preferences)**，快捷鍵為 **`Cmd + ,`**，尋找 **Local Servers/Proxies**
+2. 將 **Port** 修改為 **`8090`** (因為 8080/8081 已被靶場佔用)，Address 維持 `localhost` 或 `127.0.0.1`，點選確認。
+
+#### 步驟 2：從 ZAP 匯出並在 Chrome 中安裝 Root CA 根憑證 (解密 HTTPS 流量)
+> 💡 **為什麼要裝憑證？** 當瀏覽 HTTPS 網站時，ZAP 作為中間人代理需要動態簽發憑證。若未安裝 ZAP 根憑證，Chrome 會跳出 `NET::ERR_CERT_AUTHORITY_INVALID`（您的連線不是私人連線）並阻擋連線。
+
+1. **從 ZAP 匯出根憑證**：
+   - 進入 ZAP 的 **Options / Settings > Dynamic SSL Certificate (動態 SSL 憑證)**。
+   - 點選 **Save (儲存)** 按鈕，將憑證另存為 `owasp_zap_root_ca.cer`（存於桌面方便尋找）。
+2. **在 Windows (Chrome) 匯入憑證**：
+   - 打開 Chrome，點選右上角三個點 `⋮` -> **設定 (Settings)** -> **隱私權和安全性 (Privacy and security)** -> **安全性 (Security)**。
+   - 向下滾動點選 **管理裝置憑證 (Manage device certificates)**（或直接在 Windows 搜尋執行 `certmgr.msc`）。
+   - 切換至 **「受信任的根憑證授權單位」 (Trusted Root Certification Authorities)** 頁籤。
+   - 點選 **匯入 (Import...)** -> 瀏覽選取剛才存下的 `owasp_zap_root_ca.cer` -> 下一步 -> 完成。
+   - 若跳出安全性警告提示「是否確定要安裝此憑證？」，點選 **是 (Yes)**。
+3. **在 macOS (Chrome) 匯入憑證**：
+   - 開啟 Mac 內建的 **鑰匙圈存取 (Keychain Access)** 應用程式。
+   - 選擇 **登入 (login)** 或 **系統 (System)** 鑰匙圈。
+   - 將 `owasp_zap_root_ca.cer` 檔案拖入清單中。
+   - 雙擊開啟剛匯入的 **OWASP Root CA** 憑證，展開 **信任 (Trust)** 區塊。
+   - 將「使用此憑證時 (When using this certificate)」改為 **「永遠信任 (Always Trust)」**，關閉視窗並輸入 Mac 密碼確認。
+
+#### 步驟 3：在 Chrome 設定 Proxy 代理伺服器與排坑
+- **方法 A：使用 Chrome 擴充套件 (推薦 / 最方便切換)**
+  1. 在 Chrome 線上應用程式商店安裝 **ZeroOmega** (或 **Proxy SwitchyOmega**)。
+  2. 新增 Profile (情境模式)，協定選擇 **HTTP**，伺服器填寫 **`127.0.0.1`**，連接埠填寫 **`8090`**。
+  3. 點選儲存後，在擴充套件圖示切換為該模式即可。
+- **方法 B：使用 Windows / macOS 系統代理設定 (無套件做法)**
+  1. 打開 Chrome 設定 -> 搜尋「Proxy」-> 點選「開啟電腦的 Proxy 設定」。
+  2. 開啟「手動設定 Proxy」：IP 填 `127.0.0.1`，Port 填 `8090`。
+  3. **⚠️ 極重要排坑（學員常抓不到封包的原因）**：
+     - Windows 預設會勾選「近端 (內部網路) 位址不使用 Proxy」，且下方例外清單常有 `<local>; 127.0.0.1; localhost`。
+     - **必須將這些例外規則清空，或取消勾選近端不使用 Proxy**，否則存取 `localhost:8080` 時 Chrome 會自動繞過 ZAP 直接連線！
+
+#### 步驟 4：驗證連線
+打開 Chrome 瀏覽器，在網址列輸入 `http://127.0.0.1:8080`，切換回 ZAP 的 **History (歷史記錄)** 面板，若能看到發出的 GET 請求與 HTTP 200 回應，代表代理與憑證配置大功告成！
 
 ---
 
@@ -50,31 +87,170 @@
 
 被動掃描（Passive Scan）在網頁流量流經代理時進行不具破壞性的分析（如檢查標頭、是否有敏感資訊等）。
 
+### 🔍 如何在 ZAP 中打開「Scripts (腳本)」面板？
+在 ZAP 的預設介面中，Scripts 標籤頁通常是隱藏的。請使用以下任一方法開啟：
+
+- **方法 1（最直覺 / 點選加號）**：
+  在左側視窗（即 **Sites 標籤頁旁邊**）點選 **綠色加號 `+`** 按鈕，在下拉選單中點選 **`Scripts`**（或 `腳本`）。
+- **方法 2（選單列）**：
+  點選螢幕最上方選單 **View (檢視) > Show Tab (顯示標籤頁) > Scripts (腳本)**。
+- **方法 3（快捷鍵）**：
+  - Windows / Linux：按下 **`Ctrl + Alt + S`**
+  - macOS：按下 **`Cmd + Option + S`**
+
+> 💡 **排坑提醒（若選單中沒有 Scripts 或引擎是空的）**：
+> 1. 點選頂端工具列的「**Manage Add-ons (三個小方塊圖示)**」。
+> 2. 切換至 **Marketplace (市集)** 頁籤，搜尋 **`Script Console`** 或 **`GraalVM JavaScript`** 並點選 **Install Selected** 安裝。
+
+---
+
 ### 實作：自訂個資偵測腳本 (PII Detector)
 我們在靶場中配置了自訂個資洩漏頁面 `/pii_leakage.php`，讓我們配置 ZAP 來自動報警：
-1. 點選 ZAP 上方工具列的 **"Scripts (腳本)"** 頁籤（若無此頁籤，請點選綠色加號 `+` -> `Scripts`）。
-2. 在 `Scripts` 目錄樹的 **"Passive Rules (被動規則)"** 上按右鍵 -> **"New Script..."**。
-3. 名稱填入 `PII_Detector`，類型選 `Passive Rules`，引擎選 `Oracle Nashorn` (或 `Graal.js`)。
-4. 將 `/pii_leakage.php` 頁面上提供的 JavaScript 代碼貼入編輯區：
+
+#### 🌟 方式 A：直接載入專案預置腳本（最快就緒）
+1. 打開 **Scripts** 面板。
+2. 展開目錄樹，在 **"Passive Rules" (被動規則)** 上按右鍵 -> **"Load Script..." (載入腳本)**。
+3. 選取本專案目錄中的 **`zap/pii_detector.js`** 檔案並開啟。
+4. 在該腳本按右鍵 -> 點選 **"Enable Script" (啟用腳本)**。
+
+#### 方式 B：手動新增與編寫腳本
+1. 在 `Scripts` 目錄樹的 **"Passive Rules"** 上按右鍵 -> **"New Script..."**。
+2. 設定視窗中填入：
+   - **Script Name (名稱)**：`PII_Detector`
+   - **Type (類型)**：`Passive Rules`
+   - **Script Engine (腳本引擎)**：選擇 **`ECMAScript : Graal.js`**（若使用舊版則選 `Oracle Nashorn`）
+   - **Template (模板)**：可保留空白或選擇預設
+3. 點選 **儲存 (Save)**，將以下偵測代碼貼入右側腳本編輯區：
    ```javascript
    function scan(ps, msg, src) {
-       var body = msg.getResponseBody().toString();
-       var idRegex = /[A-Z][12]\d{8}/g; // 身分證字號 Regex
-       var idMatch = idRegex.exec(body);
-       if (idMatch !== null) {
-           raiseZapAlert(ps, msg, 10091, "自訂個資洩漏：身分證字號", idMatch[0]);
+       // 排除二進位圖片等，僅檢測文字回應
+       if (!msg.getResponseHeader().isImage() && msg.getResponseBody().length() > 0) {
+           var body = msg.getResponseBody().toString();
+           var uri = msg.getRequestHeader().getURI().toString();
+           
+           // 1. 偵測台灣身分證字號 (英文字母 + 1或2 + 8碼數字)
+           var idRegex = /[A-Z][12]\d{8}/g;
+           var idMatch = idRegex.exec(body);
+           if (idMatch) {
+               ps.raiseAlert(
+                   2, // Risk: Medium (2)
+                   2, // Confidence: Medium (2)
+                   "自訂個資洩漏：偵測到身分證字號 (PII Leakage)", // Name
+                   "網頁回應中洩漏了未遮罩的明文身分證字號：" + idMatch[0], // Description
+                   uri, // URI
+                   "",  // Param
+                   "",  // Attack
+                   "建議對身分證字號進行資料遮罩處理 (如 A12****789)。", // Solution
+                   "",  // Reference
+                   idMatch[0], // Evidence
+                   10091, // CWE ID
+                   0,     // WASC ID
+                   msg    // HTTP Message
+               );
+           }
+           
+           // 2. 偵測台灣手機號碼 (09開頭)
+           var phoneRegex = /09\d{2}-?\d{3}-?\d{3}/g;
+           var phoneMatch = phoneRegex.exec(body);
+           if (phoneMatch) {
+               ps.raiseAlert(
+                   2, // Risk: Medium (2)
+                   2, // Confidence: Medium (2)
+                   "自訂個資洩漏：偵測到手機號碼 (Phone Leakage)", // Name
+                   "網頁回應中洩漏了未遮罩的明文手機號碼：" + phoneMatch[0], // Description
+                   uri, // URI
+                   "",  // Param
+                   "",  // Attack
+                   "建議對手機號碼進行去識別化處理 (如 0912-***-678)。", // Solution
+                   "",  // Reference
+                   phoneMatch[0], // Evidence
+                   10092, // CWE ID
+                   0,     // WASC ID
+                   msg    // HTTP Message
+               );
+           }
        }
    }
-   function raiseZapAlert(ps, msg, id, name, evidence) {
-       var alert = new org.parosproxy.paros.core.scanner.Alert(id, 2, 2, name); // RISK_MEDIUM
-       alert.setDescription("偵測到明文個資洩漏！");
-       alert.setEvidence(evidence);
-       alert.setUri(msg.getRequestHeader().getURI().toString());
-       ps.parent.raiseAlert(alert);
-   }
    ```
-5. 點擊 **Save (儲存)**，並對該腳本按右鍵選擇 **Enable Script**。
-6. 當您瀏覽弱點版 `http://localhost:8080/pii_leakage.php` 時，ZAP 的 **Alerts** 面板會立刻跳出明文身分證字號警報。而存取安全版 `http://localhost:8081/pii_leakage.php` 則無警報，從中即可學到資料掩碼（Data Masking）的效益。
+4. 點選編輯器上方的 **儲存圖示**，並確認腳本為 **Enabled (已啟用)** 狀態。
+
+---
+
+### 🧩 觀念補充一：ZAP 腳本類型 (Script Type) 選項解析
+
+在建立腳本時，**Type (類型)** 決定了該腳本在 ZAP 檢測流程中的**觸發時機與角色**：
+
+| 腳本類型 (Script Type) | 觸發時機 / 特性 | 典型應用場景 |
+| :--- | :--- | :--- |
+| **Passive Rules (被動規則)**<br>*(本實作所選)* | 流量流經代理時，在背景**只讀分析**回應內容（不發送任何額外攻擊封包，安全無副作用）。 | 檢測明文個資外洩 (身分證/信用卡)、缺少安全 Header (CSP/HSTS)、Cookie 缺少 HttpOnly 等。 |
+| **Active Rules (主動規則)** | 主動掃描時觸發，會**主動發送攻擊 Payload** 到目標伺服器測試邊界。 | 自訂特殊 SQL Injection、命令注入、特定 CVE 漏洞的探測語句。 |
+| **HTTP Sender (HTTP 發送器)** | 在 ZAP 發出請求前或收到回應後**即時攔截並竄改**。 | 自動在每個請求標頭加上自訂 Authorization Token、動態計算 API 簽名 (HMAC)、更新 CSRF Token。 |
+| **Authentication (身分驗證)** | 當 ZAP 發現登入 Session 失效時自動觸發。 | 處理非標準 Form 表單的複雜登入流程（如 OAuth2 換票、JWT Refresh、多步驟登入）。 |
+| **Payload Generator / Processor** | 在 Fuzzer 暴力破解與模糊測試時觸發。 | 動態產生客製化字典檔（如自動計算 MD5 雜湊字典、Base64 編碼轉換）。 |
+| **Proxy (代理腳本)** | 瀏覽器發出請求流經 ZAP Proxy 的最前線攔截。 | 即時過濾雜訊、替換指定網址或擋下特定外部網域。 |
+| **Selenium (瀏覽器自動化)** | 控制內建的真實瀏覽器（Chromium/Firefox）。 | 模擬使用者滑鼠點選、觸發動態 JavaScript 事件與探索 SPA 單頁式應用。 |
+
+---
+
+### 🧩 觀念補充二：ZAP 腳本引擎 (Script Engine) 選項解析
+
+當您在 ZAP 建立腳本時，下拉選單會出現多種腳本引擎，其意義與適用情境如下：
+
+| 腳本引擎 (Script Engine) | 語言 / 技術核心 | 特性與適用情境 | 推薦度 |
+| :--- | :--- | :--- | :---: |
+| **Oracle Nashorn** | JavaScript (ES5.1) | **Java 8 內建的輕量級 JS 引擎**。允許在 JVM 內執行 JavaScript 並直接呼叫 ZAP 的 Java 物件（如 `Alert`、`HttpMessage`）。歷史悠久、相容性佳，但 Java 15 後已逐漸被 Graal.js 取代。 | ⭐️⭐️⭐️⭐️ |
+| **Graal.js / ECMAScript** | 現代 JavaScript (ES6+) | **Oracle GraalVM 推出的新一代高效能 JS 引擎**。完全支援現代 JavaScript 語法（`let`, `const`, Promise 等），執行效能極佳，是目前最新版 ZAP 撰寫 JS 規則的首選。 | ⭐️⭐️⭐️⭐️⭐️ (首選) |
+| **Mozilla Zest** | 無代碼 / 視覺化 JSON | **Mozilla 與 OWASP 共同開發的宣告式安全腳本語言**。適合「不會寫程式碼」的使用者，可透過 ZAP 介面拖拉、錄製 (Record) 與設定條件來建立自動化測試流程。 | ⭐️⭐️⭐️⭐️ |
+| **Python (Jython)** | Python 2.7 / 3 | **在 Java 上運行的 Python 解譯器**。適合習慣使用 Python 撰寫資安 PoC、自動化爬蟲或自訂 Payload 處理規則的測試人員。 | ⭐️⭐️⭐️⭐️ |
+| **Groovy / Kotlin / Ruby** | JVM 衍生語言 | 供熟悉特定 JVM 程式語言的工程師使用，功能與 JavaScript 引擎相同，皆可操作 ZAP API。 | ⭐️⭐️ |
+
+> 💡 **選用建議**：若您撰寫的是一般的 JavaScript 規則（如本章的個資偵測），請優先選擇 **`ECMAScript : Graal.js`** 或 **`Oracle Nashorn`** 即可。
+
+---
+
+### 📚 自訂被動掃描腳本開發指南與官方 API 規格
+
+為了讓學員未來能自行開發符合企業需求的自訂防護或稽核規則，以下提供 ZAP 官方標準 `ps.raiseAlert()` 函式的完整參數規格與開發參考資源：
+
+#### 1. `ps.raiseAlert()` 參數完整規格表
+
+```javascript
+ps.raiseAlert(risk, confidence, name, description, uri, param, attack, otherInfo, solution, evidence, cweId, wascId, msg);
+```
+
+| 參數位置 | 參數名稱 | 資料型態 | 說明與填寫範例 |
+| :--- | :--- | :--- | :--- |
+| 1 | `risk` | int | **風險等級**：`0` = Informational (資訊), `1` = Low (低), `2` = Medium (中), `3` = High (高) |
+| 2 | `confidence` | int | **可信度**：`0` = False Positive, `1` = Low, `2` = Medium, `3` = High, `4` = User Confirmed |
+| 3 | `name` | String | **警報標題名稱**（例如："自訂個資洩漏：偵測到身分證字號"） |
+| 4 | `description` | String | **漏洞詳細敘述**（例如："網頁回應內容中包含未遮罩的明文身分證字號..."） |
+| 5 | `uri` | String | **目標 URL 網址**（透過 `msg.getRequestHeader().getURI().toString()` 取得） |
+| 6 | `param` | String | **觸發的參數名稱**（若針對整體 Response Body 檢測，填寫空字串 `""` 即可） |
+| 7 | `attack` | String | **攻擊 Payload 字串**（被動掃描無主動攻擊，通常填寫空字串 `""`） |
+| 8 | `otherInfo` | String | **其他補充資訊**（可填寫修復細節或內部合規政策指引） |
+| 9 | `solution` | String | **防禦修復建議**（例如："落實個資遮罩 (Data Masking) 與去識別化規範。"） |
+| 10 | `evidence` | String | **關鍵證據文字**（將高亮標註在 ZAP 檢視視窗中，如匹配到的身分證字號 `A123456789`） |
+| 11 | `cweId` | int | **CWE 弱點編號**（例如：`359` 代表機敏個資外洩，`200` 代表一般資訊洩漏） |
+| 12 | `wascId` | int | **WASC 威脅分類編號**（例如：`13` 代表 Information Leakage） |
+| 13 | `msg` | HttpMessage | **當前的 HTTP 訊息物件**（傳入 `msg` 本體，供 ZAP 關聯請求與回應封包） |
+
+---
+
+#### 2. 官方參考資源與開發文件 (Official References)
+
+學員若想深入研究各類自訂腳本（如 HTTP 請求修改、動態加解密、自動化認證），可直接查閱以下官方資源：
+
+- 📖 **ZAP 官方 Scripting 使用指南**：[https://www.zaproxy.org/docs/desktop/addons/script-console/](https://www.zaproxy.org/docs/desktop/addons/script-console/)
+- 🌐 **ZAP 官方 Community Scripts 社群範例庫 (GitHub)**：[https://github.com/zaproxy/community-scripts](https://github.com/zaproxy/community-scripts)
+  *(內含大量由全球資安專家撰寫的 JavaScript / Python 被動與主動規則範例)*
+- 📑 **ZAP PassiveScanHelper Javadoc API 文件**：[https://javadoc.io/doc/org.zaproxy/zap/latest/org/zaproxy/zap/extension/pscan/PassiveScanHelper.html](https://javadoc.io/doc/org.zaproxy/zap/latest/org/zaproxy/zap/extension/pscan/PassiveScanHelper.html)
+
+---
+
+#### 驗證成果：
+1. 使用 ZAP 瀏覽器存取弱點版 `http://localhost:8080/pii_leakage.php`。
+2. 切換至 ZAP 的 **Alerts (警示)** 面板，會立刻跳出 **「自訂個資洩漏：偵測到身分證字號 (PII Leakage)」** 與 **「自訂個資洩漏：偵測到手機號碼 (Phone Leakage)」** 的黃色警報！
+3. 接著存取修正版 `http://localhost:8081/pii_leakage.php`，觀察到該警報不會觸發，從中即可學到資料掩碼（Data Masking）的效益。
 
 ---
 

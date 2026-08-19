@@ -81,26 +81,48 @@ $students = [
                 </div>
                 <div class="card-body">
                     <p class="text-muted">安全版亦提供與弱點版相同的 ZAP 被動腳本代碼供學員下載，以在 ZAP 內同時加入並對比兩個站點的掃描警報差異：</p>
-                    <pre><code class="language-javascript">// ZAP被動掃描自訂腳本 - 偵測台灣身分證與手機號碼
-function scan(ps, msg, src) {
-    var body = msg.getResponseBody().toString();
-    
-    // 1. 偵測台灣身分證字號
-    var idRegex = /[A-Z][12]\d{8}/g;
-    var idMatch = idRegex.exec(body);
-    if (idMatch !== null) {
-        raiseZapAlert(ps, msg, 10091, "自訂個資洩漏：偵測到身分證字號", 
-                      "網頁回應中洩漏了明文身分證字號：" + idMatch[0], idMatch[0]);
-    }
-    
-    // 2. 偵測台灣手機號碼
-    var phoneRegex = /09\d{2}-\d{3}-\d{3}|09\d{8}/g;
-    var phoneMatch = phoneRegex.exec(body);
-    if (phoneMatch !== null) {
-        raiseZapAlert(ps, msg, 10092, "自訂個資洩漏：偵測到手機號碼", 
-                      "網頁回應中洩漏了明文手機號碼：" + phoneMatch[0], phoneMatch[0]);
+                    <pre><code class="language-javascript">function scan(ps, msg, src) {
+    // 排除二進位圖片等，僅檢測文字回應
+    if (!msg.getResponseHeader().isImage() && msg.getResponseBody().length() > 0) {
+        var body = msg.getResponseBody().toString();
+        var uri = msg.getRequestHeader().getURI().toString();
+        
+        // 1. 偵測台灣身分證字號
+        var idRegex = /[A-Z][12]\d{8}/g;
+        var idMatch = idRegex.exec(body);
+        if (idMatch) {
+            ps.raiseAlert(
+                2, 3, "自訂個資洩漏：偵測到身分證字號 (PII Leakage)",
+                "網頁回應中洩漏了未遮罩的明文身分證字號：" + idMatch[0],
+                uri, "", "",
+                "建議對身分證字號進行資料遮罩處理 (如 A12****789)。",
+                "落實資料庫輸出過濾與個資遮蔽 (Data Masking) 規範。",
+                idMatch[0], 359, 13, msg
+            );
+        }
+        
+        // 2. 偵測台灣手機號碼
+        var phoneRegex = /09\d{2}-?\d{3}-?\d{3}/g;
+        var phoneMatch = phoneRegex.exec(body);
+        if (phoneMatch) {
+            ps.raiseAlert(
+                2, 3, "自訂個資洩漏：偵測到手機號碼 (Phone Leakage)",
+                "網頁回應中洩漏了未遮罩的明文手機號碼：" + phoneMatch[0],
+                uri, "", "",
+                "建議對手機號碼進行去識別化處理 (如 0912-***-678)。",
+                "落實輸出編碼與機敏欄位隱碼政策。",
+                phoneMatch[0], 359, 13, msg
+            );
+        }
     }
 }</code></pre>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            📚 <strong>官方開發手冊與範例庫：</strong><br>
+                            • <a href="https://www.zaproxy.org/docs/desktop/addons/script-console/" target="_blank" class="text-primary">ZAP 官方 Scripting 手冊</a><br>
+                            • <a href="https://github.com/zaproxy/community-scripts" target="_blank" class="text-primary">ZAP Community Scripts 社群腳本範例庫</a>
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>

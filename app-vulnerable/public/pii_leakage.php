@@ -69,13 +69,19 @@ $students = [
                     </div>
                     
                     <div class="alert alert-warning mt-4">
-                        💡 <strong>教學步驟指引：</strong><br>
-                        1. 開啟 <strong>OWASP ZAP</strong>。<br>
-                        2. 點選 ZAP 上方的 <strong>"Scripts"</strong> 頁籤（若沒看到，點選綠色加號 `+` -> `Scripts`）。<br>
-                        3. 在 `Scripts` 目錄樹的 <strong>"Passive Rules"</strong> 上點擊右鍵 -> <strong>"New Script..."</strong>。<br>
-                        4. 腳本名稱填入 `PII_Detector`，類型選 `Passive Rules`，腳本引擎選 `Oracle Nashorn` (或 `Graal.js`)，範本選 `Empty`。<br>
-                        5. 將右側的 JavaScript 程式碼貼入腳本編輯區，點選儲存 (Save)，並點擊右鍵選擇 <strong>"Enable Script"</strong> 啟用。<br>
-                        6. 用瀏覽器重新載入此網頁，觀察 ZAP 的 <strong>"Alerts (警報)"</strong> 面板，您將會看見由我們自訂腳本發出的身分證與手機洩漏警報！
+                        💡 <strong>教學實作指引（二選一）：</strong><br>
+                        <strong>🌟 方式 A（一鍵載入，最推薦）：</strong><br>
+                        1. 點選 ZAP 左側視窗的 <strong>"Scripts (腳本)"</strong> 頁籤（若沒看到，點選綠色加號 `+` -> `Scripts`）。<br>
+                        2. 在目錄樹的 <strong>"Passive Rules"</strong> 上點擊右鍵 -> <strong>"Load Script..." (載入腳本)</strong>。<br>
+                        3. 選取本專案目錄中的 <strong><code>zap/pii_detector.js</code></strong> 檔案並開啟。<br>
+                        4. 在該腳本按右鍵確認為 <strong>"Enable Script" (已啟用)</strong>。<br>
+                        <hr class="my-2">
+                        <strong>方式 B（手動建立與貼上代碼）：</strong><br>
+                        1. 在 <strong>"Passive Rules"</strong> 上按右鍵 -> <strong>"New Script..."</strong>。<br>
+                        2. 類型選 <code>Passive Rules</code>，腳本引擎選 <code>ECMAScript : Graal.js</code>（若舊版則選 <code>Oracle Nashorn</code>），點選「儲存」。<br>
+                        3. 將右側的 JavaScript 代碼完整貼入編輯區，按 <code>Ctrl + S</code> 儲存。<br>
+                        <hr class="my-2">
+                        👉 <strong>驗證方式：</strong> 重新整理本網頁（按 <code>Ctrl + F5</code>），ZAP 的 <strong>Alerts (警報)</strong> 面板就會立即跳出由自訂腳本觸發的身分證與手機洩漏警報！
                     </div>
                 </div>
             </div>
@@ -85,45 +91,56 @@ $students = [
         <div class="col-md-6">
             <div class="card shadow-sm border-warning">
                 <div class="card-header">
-                    💻 ZAP 被動防護規則腳本 (JavaScript)
+                    💻 ZAP 被動防護規則腳本 (JavaScript / Graal.js)
                 </div>
                 <div class="card-body">
-                    <p class="text-muted">複製下方代碼並貼入 ZAP 的被動掃描腳本（Passive Rules）中：</p>
-                    <pre><code class="language-javascript">// ZAP被動掃描自訂腳本 - 偵測台灣身分證與手機號碼
-function scan(ps, msg, src) {
-    // 取得網頁回應的 HTML 內容
-    var body = msg.getResponseBody().toString();
-    
-    // 1. 偵測台灣身分證字號 (字母 + 1或2 + 8位數字)
-    var idRegex = /[A-Z][12]\d{8}/g;
-    var idMatch = idRegex.exec(body);
-    if (idMatch !== null) {
-        raiseZapAlert(ps, msg, 10091, "自訂個資洩漏：偵測到身分證字號", 
-                      "網頁回應中洩漏了明文身分證字號：" + idMatch[0], idMatch[0]);
+                    <p class="text-muted">本腳本使用 ZAP 官方標準 <code>ps.raiseAlert()</code> API 撰寫：</p>
+                    <pre><code class="language-javascript">function scan(ps, msg, src) {
+    // 排除二進位圖片等，僅檢測文字回應
+    if (!msg.getResponseHeader().isImage() && msg.getResponseBody().length() > 0) {
+        var body = msg.getResponseBody().toString();
+        var uri = msg.getRequestHeader().getURI().toString();
+        
+        // 1. 偵測台灣身分證字號 (英文字母 + 1或2 + 8碼數字)
+        var idRegex = /[A-Z][12]\d{8}/g;
+        var idMatch = idRegex.exec(body);
+        if (idMatch) {
+            ps.raiseAlert(
+                2, // Risk: Medium (2)
+                3, // Confidence: High (3)
+                "自訂個資洩漏：偵測到身分證字號 (PII Leakage)", 
+                "網頁回應中洩漏了未遮罩的明文身分證字號：" + idMatch[0], 
+                uri, "", "", 
+                "建議對身分證字號進行資料遮罩處理 (如 A12****789)。", 
+                "落實資料庫輸出過濾與個資遮蔽 (Data Masking) 規範。", 
+                idMatch[0], 359, 13, msg
+            );
+        }
+        
+        // 2. 偵測台灣手機號碼 (09開頭)
+        var phoneRegex = /09\d{2}-?\d{3}-?\d{3}/g;
+        var phoneMatch = phoneRegex.exec(body);
+        if (phoneMatch) {
+            ps.raiseAlert(
+                2, // Risk: Medium (2)
+                3, // Confidence: High (3)
+                "自訂個資洩漏：偵測到手機號碼 (Phone Leakage)", 
+                "網頁回應中洩漏了未遮罩的明文手機號碼：" + phoneMatch[0], 
+                uri, "", "", 
+                "建議對手機號碼進行去識別化處理 (如 0912-***-678)。", 
+                "落實輸出編碼與機敏欄位隱碼政策。", 
+                phoneMatch[0], 359, 13, msg
+            );
+        }
     }
-    
-    // 2. 偵測台灣手機號碼 (09開頭 + 8位數字，或帶有連字號)
-    var phoneRegex = /09\d{2}-\d{3}-\d{3}|09\d{8}/g;
-    var phoneMatch = phoneRegex.exec(body);
-    if (phoneMatch !== null) {
-        raiseZapAlert(ps, msg, 10092, "自訂個資洩漏：偵測到手機號碼", 
-                      "網頁回應中洩漏了明文手機號碼：" + phoneMatch[0], phoneMatch[0]);
-    }
-}
-
-// 建立警報輔助函式
-function raiseZapAlert(ps, msg, id, name, desc, evidence) {
-    var alert = new org.parosproxy.paros.core.scanner.Alert(
-        id,
-        org.parosproxy.paros.core.scanner.Alert.RISK_INFO, // 資訊等級
-        org.parosproxy.paros.core.scanner.Alert.CONFIDENCE_MEDIUM,
-        name
-    );
-    alert.setDescription(desc);
-    alert.setEvidence(evidence);
-    alert.setUri(msg.getRequestHeader().getURI().toString());
-    ps.parent.raiseAlert(alert);
 }</code></pre>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            📚 <strong>官方開發手冊與範例庫：</strong><br>
+                            • <a href="https://www.zaproxy.org/docs/desktop/addons/script-console/" target="_blank" class="text-warning">ZAP 官方 Scripting 手冊</a><br>
+                            • <a href="https://github.com/zaproxy/community-scripts" target="_blank" class="text-warning">ZAP Community Scripts 社群腳本範例庫</a>
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
