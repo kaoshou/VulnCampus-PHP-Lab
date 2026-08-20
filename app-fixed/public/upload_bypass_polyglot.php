@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $upload_dir = __DIR__ . '/uploads/';
         if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            @mkdir($upload_dir, 0777, true);
         }
 
         // 安全修補 1：檢查副檔名是否在白名單中 (只允許 jpg, jpeg, png, gif)

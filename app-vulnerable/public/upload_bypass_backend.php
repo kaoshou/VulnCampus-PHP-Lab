@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $upload_dir = __DIR__ . '/uploads/';
         if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            @mkdir($upload_dir, 0777, true);
         }
 
         // 第三關：不安全後端 MIME 類型驗證 (只檢查 Content-Type 標頭)

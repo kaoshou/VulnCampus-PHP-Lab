@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $upload_dir = __DIR__ . '/uploads/';
         if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            @mkdir($upload_dir, 0777, true);
         }
 
         // 弱點版：完全不檢驗副檔名與 PDF 特徵，直接保留原始檔名儲存

@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 確保 uploads 目錄存在
         $upload_dir = __DIR__ . '/uploads/';
         if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0777, true);
+            @mkdir($upload_dir, 0777, true);
         }
 
         // 修補重點 1：檢查副檔名 (Extension Whitelist)
